@@ -11,7 +11,7 @@ export default function LoginPage() {
   });
 
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {

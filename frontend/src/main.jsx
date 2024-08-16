@@ -10,6 +10,7 @@ import Home from './Home.jsx'
 import LoginPage from './LoginPage.jsx'
 import RegisterPage from './RegisterPage.jsx'
 import ProtectedRoute from './ProtectedRoute.jsx'
+import AuthRedirect from './AuthRedirect.jsx'
 
 const router = createBrowserRouter([
   {
@@ -36,11 +37,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <LoginPage />, // Public route for login
+        element: <AuthRedirect><LoginPage /></AuthRedirect>,
       },
       {
         path: "/register",
-        element: <RegisterPage />, // Public route for registration
+        element: <AuthRedirect><RegisterPage /></AuthRedirect>,
       },
     ],
   },

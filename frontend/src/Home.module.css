@@ -1,0 +1,39 @@
+.mainContainer {
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  gap: 16px;
+  height: 100vh;
+  padding: 8px;
+}
+
+.sidebarLeft {
+  background-color: red;
+}
+
+.sidebarRight {
+  background-color: green;
+}
+
+.main {
+  background-color: blue;
+}
+
+@media (max-width: 1024px) {
+  .mainContainer {
+    grid-template-columns: 1fr 3fr;
+  }
+
+  .sidebarRight {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebarLeft {
+    display: none;
+  }
+}
