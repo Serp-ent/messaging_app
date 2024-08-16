@@ -11,16 +11,48 @@ export default function Home() {
   return (
     <div className={styles.mainContainer}>
       <aside className={`${styles.sidebarLeft} ${isMenuOpen ? styles.open : ''}`}>
-        <ul>
-          <li><a href="">Contact1</a></li>
-          <li><a href="">Contact2</a></li>
-          <li><a href="">Contact3</a></li>
-          <li><a href="">Contact4</a></li>
+        <ul className={styles.conversationList}>
+          <li className={styles.conversation}>
+            <div className={styles.userInfo}>
+              <div className={styles.conversationAvatar}>
+              </div>
+              <div> Name Surname </div>
+            </div>
+            <div>Last message</div>
+          </li>
+
+          <li className={styles.conversation}>
+            <div className={styles.userInfo}>
+              <div className={styles.conversationAvatar}>
+              </div>
+              <div> Name Surname </div>
+            </div>
+            <div>Last message</div>
+          </li>
+
+          <li className={styles.conversation}>
+            <div className={styles.userInfo}>
+              <div className={styles.conversationAvatar}>
+              </div>
+              <div> Name Surname </div>
+            </div>
+            <div>Last message</div>
+          </li>
+
         </ul>
       </aside>
 
       <main className={styles.main}>
-        <h1>Main content</h1>
+        <div className={styles.messageBubble}>
+          <span className={styles.sender}>Sender Name</span>
+          <p>This is the content of the message.</p>
+          <time dateTime="2024-08-16T12:34">12:34 PM</time>
+        </div>
+        <div className={styles.messageBubble}>
+          <span className={styles.sender}>Sender Name</span>
+          <p>This is another message content.</p>
+          <time dateTime="2024-08-16T12:35">12:35 PM</time>
+        </div>
       </main>
 
       <aside className={styles.sidebarRight}>

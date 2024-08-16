@@ -21,8 +21,6 @@
 .menuButton {
   display: none;
   position: fixed;
-  top: 20px;
-  left: 20px;
   font-size: 30px;
   background: none;
   border: none;
@@ -38,6 +36,39 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+}
+
+.conversationList {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.conversation {
+  box-sizing: border-box;
+  border: 1px solid black;
+  width: 94%;
+  padding: 8px;
+  background-color: white;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 16px;
+}
+
+.userInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.conversationAvatar {
+  width: 30px;
+  height: 30px;
+  border: 1px solid black;
+  border-radius: 50%;
 }
 
 @media (max-width: 1024px) {
@@ -58,6 +89,7 @@
   .sidebarLeft {
     transform: translateX(-100%);
     position: fixed;
+    top: 0;
     width: 200px;
     height: 100%;
     z-index: 1002;

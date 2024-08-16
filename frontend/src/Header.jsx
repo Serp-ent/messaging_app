@@ -9,8 +9,9 @@ export default function Header() {
     <header className={styles.header}>
       {user ? (
 
-        <div>
-          User logged in
+        <div className={styles.profileHeader}>
+          <div> Bruce Lee </div>
+          <div className={styles.userAvatar}></div>
           <button onClick={logout}>Logout</button>
         </div>
       ) : (
@@ -19,7 +20,10 @@ export default function Header() {
           <Link to={'/register'}>Register</Link>
         </>
       )
+
       }
-    </header>
+
+      <div className={styles.spacer}></div>
+    </header >
   );
 }
