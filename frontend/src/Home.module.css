@@ -3,7 +3,6 @@
   grid-template-columns: 1fr 3fr 1fr;
   gap: 16px;
   height: 100vh;
-  padding: 8px;
 }
 
 .sidebarLeft {

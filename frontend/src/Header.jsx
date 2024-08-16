@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import styles from './Header.module.css'
 
 export default function Header() {
   const { user, login, logout } = useAuth();
 
   return (
-    <header>
+    <header className={styles.header}>
       {user ? (
 
         <div>
