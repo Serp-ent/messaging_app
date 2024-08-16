@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Root from './Root.jsx'
 import ErrorPage from './ErrorPage.jsx'
 import AuthProvider from './AuthContext.jsx'
 import Profile from './Profile.jsx'
@@ -15,11 +14,7 @@ import ProtectedRoute from './ProtectedRoute.jsx'
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <AuthProvider>
-        <Root />
-      </AuthProvider>
-    ),
+    element: <AuthProvider><App /></AuthProvider>,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -39,15 +34,15 @@ const router = createBrowserRouter([
           }
         ]
       },
+      {
+        path: "/login",
+        element: <LoginPage />, // Public route for login
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />, // Public route for registration
+      },
     ],
-  },
-  {
-    path: "/login",
-    element: <LoginPage />, // Public route for login
-  },
-  {
-    path: "/register",
-    element: <RegisterPage />, // Public route for registration
   },
   {
     path: "*",
@@ -58,5 +53,5 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>,
-)
+  </StrictMode>
+);
