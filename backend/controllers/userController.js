@@ -38,6 +38,14 @@ const handleValidationErrors = (req, res, next) => {
     });
   }
 
+  const { username, email, password, passwordConfirm } = req.body;
+  if (!username || !email || !password || !passwordConfirm) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Request cannot be empty',
+    });
+  }
+
   next();
 }
 
@@ -111,6 +119,12 @@ const createUserChain = [
 const login = async (req, res) => {
   const { username, password } = req.body;
   // TODO: check if username and password are non null
+  if (!username || !password) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Please provide username and password',
+    });
+  }
 
   const user = await prisma.user.findUnique({
     where: { username, }

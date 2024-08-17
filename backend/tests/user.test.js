@@ -361,7 +361,7 @@ describe('Login', () => {
     expect(response.body.token).not.toBe('');
   })
 
-  it('Should return token on successful login for first user', async () => {
+  it('Should return token on successful login for second user', async () => {
     const userCredentials = {
       username: 'user2',
       password: 'Pass456'
@@ -376,6 +376,16 @@ describe('Login', () => {
     expect(response.body).toHaveProperty('token');
     expect(typeof response.body.token).toBe("string");
     expect(response.body.token).not.toBe('');
+  })
+
+  it('Should return 400 on empty body', async () => {
+    const response = await request(app)
+      .post('/user/login')
+      .expect(400);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body).toHaveProperty('message', 'Please provide username and password');
+
   })
 
   it('Should return 401 for incorrect username', async () => {
