@@ -1,6 +1,8 @@
 const prisma = require('../db/prismaClient');
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
+const asyncHandler = require('express-async-handler');
+const { ConflictError, BadRequestError, UnauthorizedError } = require('../error/errors');
 
 const validateUserCreation = [
   body('firstName')
@@ -31,7 +33,6 @@ const validateUserCreation = [
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    // TODO: should throw ValidationError
     return res.status(400).json({
       status: 'error',
       errors: errors.array(),
@@ -40,16 +41,13 @@ const handleValidationErrors = (req, res, next) => {
 
   const { username, email, password, passwordConfirm } = req.body;
   if (!username || !email || !password || !passwordConfirm) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Request cannot be empty',
-    });
+    throw new BadRequestError('Request cannot be empty');
   }
 
   next();
 }
 
-const checkIfCredentialsUnused = async (req, res, next) => {
+const checkIfCredentialsUnused = asyncHandler(async (req, res, next) => {
   const { username, email } = req.body;
 
   const existingUser = await prisma.user.findFirst({
@@ -60,19 +58,16 @@ const checkIfCredentialsUnused = async (req, res, next) => {
       ]
     }
   });
+
   if (existingUser) {
-    // TODO: should throw and catch in error handler
     const property = existingUser.email === email ? 'email' : 'username';
-    return res.status(409).json({
-      status: 'error',
-      message: `${property} already in use`,
-    });
+    throw new ConflictError(`${property} already in use`);
   }
 
   next();
-}
+});;
 
-const createUser = async (req, res) => {
+const createUser = asyncHandler(async (req, res) => {
   const {
     firstName,
     lastName,
@@ -82,8 +77,6 @@ const createUser = async (req, res) => {
     passwordConfirm
   } = req.body;
 
-  // TODO: validation
-  // TODO: check if user exists
   // TODO: hash password
   const user = await prisma.user.create({
     data: {
@@ -105,7 +98,7 @@ const createUser = async (req, res) => {
       email: user.email,
     },
   });
-}
+});
 
 const createUserChain = [
   validateUserCreation,
@@ -116,38 +109,32 @@ const createUserChain = [
 ];
 
 
-const login = async (req, res) => {
+const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
-  // TODO: check if username and password are non null
   if (!username || !password) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Please provide username and password',
-    });
+    throw new BadRequestError('Please provide username and password');
   }
 
   const user = await prisma.user.findUnique({
     where: { username, }
   });
   if (!user) {
-    return res.status(401).json({ status: 'Unauthorized', message: 'Incorrect username or password' });
+    throw new UnauthorizedError('Incorrect username or password');
   }
 
   // TODO: use bcrypt to compare hash
-  // TODO: sign jwt token
-
   const isMatch = user.password === password;
   if (!isMatch) {
-    return res.status(401).json({ status: 'Unauthorized', message: 'Incorrect username or password' });
+    throw new UnauthorizedError('Incorrect username or password');
   }
 
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
 
-  return res.json({
+  res.json({
     status: 'success',
     token,
   })
-}
+});
 
 
 const getUser = async (req, res) => {

@@ -399,7 +399,7 @@ describe('Login', () => {
       .send(userCredentials)
       .expect(401);
 
-    expect(response.body).toHaveProperty("status", 'Unauthorized');
+    expect(response.body).toHaveProperty("status", 'error');
     expect(response.body).toHaveProperty('message', 'Incorrect username or password');
   })
 
@@ -414,7 +414,7 @@ describe('Login', () => {
       .send(userCredentials)
       .expect(401);
 
-    expect(response.body).toHaveProperty("status", 'Unauthorized');
+    expect(response.body).toHaveProperty("status", 'error');
     expect(response.body).toHaveProperty('message', 'Incorrect username or password');
   })
 });
