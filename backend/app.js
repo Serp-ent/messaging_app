@@ -3,9 +3,11 @@ const usersRoute = require('./routes/usersRoute');
 const conversationsRoute = require('./routes/conversationsRoute');
 const messagesRoute = require('./routes/messagesRoute');
 const errorHandler = require('./error/errorHandler');
+const cors = require('cors');
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

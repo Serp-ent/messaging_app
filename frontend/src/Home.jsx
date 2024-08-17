@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './Home.module.css'
+import SidebarRight from './SidebarRight';
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -55,9 +56,7 @@ export default function Home() {
         </div>
       </main>
 
-      <aside className={styles.sidebarRight}>
-
-      </aside>
+      <SidebarRight/>
 
       <button className={styles.menuButton} onClick={toggleMenu}>
         &#9776;
