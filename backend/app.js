@@ -2,6 +2,7 @@ const express = require('express');
 const usersRoute = require('./routes/usersRoute');
 const conversationsRoute = require('./routes/conversationsRoute');
 const messagesRoute = require('./routes/messagesRoute');
+const errorHandler = require('./error/errorHandler');
 
 const app = express();
 
@@ -11,6 +12,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/users', usersRoute);
 app.use('/api/messages', messagesRoute);
 app.use('/api/conversation', conversationsRoute);
+
+app.use(errorHandler);
 
 const PORT = 3000;
 app.listen(PORT, () => {
