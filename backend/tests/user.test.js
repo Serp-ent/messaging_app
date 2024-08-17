@@ -8,21 +8,31 @@ const prisma = require('../db/prismaClient');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/user', userController.createUser);
+app.post('/user', userController.createUserChain);
 app.post('/user/login', userController.login);
 app.get('/user/:id', userController.getUser);
 
 app.use(errorHandler);
 
-beforeEach(async () => {
-
-})
-
-afterAll(async () => {
-  await prisma.$executeRaw`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE`;
-});
-
 describe('User registration', () => {
+  beforeEach(async () => {
+    // const user = {
+    //   firstName: 'name',
+    //   lastName: 'surname',
+    //   username: 'username',
+    //   email: 'email',
+    //   password: 'password',
+    // };
+
+    // prisma.user.create({
+    //   data: user,
+    // });
+  })
+
+  afterAll(async () => {
+    await prisma.$executeRaw`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE`;
+  });
+
   it("Should create a new user successfully", async () => {
     const newUser = {
       firstName: 'testFirstName',
@@ -70,31 +80,251 @@ describe('User registration', () => {
     expect(got).toMatchObject(want);
   })
 
-  //  it('should return a 400 status if username or password is missing', async () => {
-  //     const incompleteUser = { username: '' };
+  // it('should return a 400 status if username or password is missing', async () => {
+  //   const incompleteUser = { username: '' };
 
-  //     const response = await request(app)
-  //       .post('/user')
-  //       .send(incompleteUser);
+  //   const response = await request(app)
+  //     .post('/user')
+  //     .send(incompleteUser)
+  //     .expect(400);
 
-  //     expect(response.status).toBe(400);
-  //     expect(response.body).toHaveProperty('error', 'Username and password are required');
-  //   });
+  //   expect(response.body).toHaveProperty('status', 'error');
+  //   expect(response.body).toHaveProperty('message');
+  // });
 
-  //   it('should return a 409 status if the user already exists', async () => {
-  //     const existingUser = { username: 'testuser', password: 'testpass' };
+  it('should return a 409 status if the user username is in use', async () => {
+    const existingUser = {
+      firstName: 'testFirstName1',
+      lastName: 'testLastName1',
+      username: 'testUsername1',
+      email: 'test1@email.com',
+      password: 'password1',
+      passwordConfirm: 'password1',
+    }
 
-  //     // First registration
-  //     await request(app)
-  //       .post('/user')
-  //       .send(existingUser);
+    // First registration
+    await request(app)
+      .post('/user')
+      .send(existingUser);
 
-  //     // Attempt to register the same user again
-  //     const response = await request(app)
-  //       .post('/user')
-  //       .send(existingUser);
+    existingUser.email = 'unusedEmail@gmail.com';
+    // Attempt to register the same user again
+    const response = await request(app)
+      .post('/user')
+      .send(existingUser)
+      .expect(409);
 
-  //     expect(response.status).toBe(409);
-  //     expect(response.body).toHaveProperty('error', 'User already exists');
-  //   });
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body).toHaveProperty('message', 'username already in use');
+  });
+  it('should return a 409 status if the user email is in use', async () => {
+    const existingUser = {
+      firstName: 'testFirstName1',
+      lastName: 'testLastName1',
+      username: 'testUsername1',
+      email: 'test1@email.com',
+      password: 'password1',
+      passwordConfirm: 'password1',
+    }
+
+    // First registration
+    await request(app)
+      .post('/user')
+      .send(existingUser);
+
+
+    existingUser.username = 'unusedUsername';
+    // Attempt to register the same user again
+    const response = await request(app)
+      .post('/user')
+      .send(existingUser)
+      .expect(409);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body).toHaveProperty('message', 'email already in use');
+  });
+
+  it('should return a 400 status if firstName is too short', async () => {
+    const userWithShortFirstName = {
+      firstName: 'A',
+      lastName: 'lastName',
+      username: 'username',
+      email: 'test@example.com',
+      password: 'password',
+      passwordConfirm: 'password',
+    };
+
+    const response = await request(app)
+      .post('/user')
+      .send(userWithShortFirstName)
+      .expect(400);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body).toHaveProperty('errors');
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          msg: 'First name must be between 2 and 72 characters',
+          path: 'firstName',
+        })
+      ])
+    );
+  });
+
+  it('should return a 400 status if firstName is too long', async () => {
+    const userWithLongFirstName = {
+      firstName: 'A'.repeat(73),
+      lastName: 'lastName',
+      username: 'username',
+      email: 'test@example.com',
+      password: 'password',
+      passwordConfirm: 'password',
+    };
+
+    const response = await request(app)
+      .post('/user')
+      .send(userWithLongFirstName)
+      .expect(400);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          msg: 'First name must be between 2 and 72 characters',
+          path: 'firstName',
+        })
+      ])
+    );
+  });
+
+  it('should return a 400 status if email is invalid', async () => {
+    const userWithInvalidEmail = {
+      firstName: 'firstName',
+      lastName: 'lastName',
+      username: 'username',
+      email: 'invalid-email',
+      password: 'password',
+      passwordConfirm: 'password',
+    };
+
+    const response = await request(app)
+      .post('/user')
+      .send(userWithInvalidEmail)
+      .expect(400);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          msg: 'Invalid email format',
+          path: 'email',
+        })
+      ])
+    );
+  });
+
+  it('should return a 400 status if password is too short', async () => {
+    const userWithShortPassword = {
+      firstName: 'firstName',
+      lastName: 'lastName',
+      username: 'username',
+      email: 'test@example.com',
+      password: 'short',
+      passwordConfirm: 'short',
+    };
+
+    const response = await request(app)
+      .post('/user')
+      .send(userWithShortPassword)
+      .expect(400);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          msg: 'Password must be at least 6 characters',
+          path: 'password',
+        })
+      ])
+    );
+  });
+
+  it('should return a 400 status if passwordConfirm is missing', async () => {
+    const incompleteUser = {
+      firstName: 'firstName',
+      lastName: 'lastName',
+      username: 'username',
+      email: 'test@example.com',
+      password: 'password',
+    };
+
+    const response = await request(app)
+      .post('/user')
+      .send(incompleteUser)
+      .expect(400);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          msg: 'Password confirmation is required',
+          path: 'passwordConfirm',
+        })
+      ])
+    );
+  });
+
+
+  it('should return a 400 status if password confirmation does not match', async () => {
+    const userWithMismatchedPasswords = {
+      firstName: 'firstName',
+      lastName: 'lastName',
+      username: 'username',
+      email: 'test@example.com',
+      password: 'password1',
+      passwordConfirm: 'password2',
+    };
+
+    const response = await request(app)
+      .post('/user')
+      .send(userWithMismatchedPasswords)
+      .expect(400);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          msg: 'Passwords do not match',
+          path: 'passwordConfirm',
+        })
+      ])
+    );
+  });
+
+  it('should return a 400 status if username or email is missing', async () => {
+    const userWithMissingUsername = {
+      firstName: 'firstName',
+      lastName: 'lastName',
+      email: 'test@example.com',
+      password: 'password',
+      passwordConfirm: 'password',
+    };
+
+    const response = await request(app)
+      .post('/user')
+      .send(userWithMissingUsername)
+      .expect(400);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          msg: 'Username is required',
+          path: 'username',
+        })
+      ])
+    );
+  });
+
+
 })
