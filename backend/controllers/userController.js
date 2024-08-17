@@ -2,7 +2,7 @@ const prisma = require('../db/prismaClient');
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
-const { ConflictError, BadRequestError, UnauthorizedError } = require('../error/errors');
+const { ConflictError, BadRequestError, UnauthorizedError, NotFoundError } = require('../error/errors');
 
 const validateUserCreation = [
   body('firstName')
@@ -137,9 +137,22 @@ const login = asyncHandler(async (req, res) => {
 });
 
 
-const getUser = async (req, res) => {
-  // Retrieve user details
-}
+const getUser = asyncHandler(async (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  if (isNaN(userId) || userId < 0) {
+    throw new BadRequestError('Invalid user ID format');
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  res.json({
+    status: 'success',
+    user,
+  });
+});
 
 const getAllUsers = asyncHandler(async (req, res) => {
   const users = await prisma.user.findMany({});

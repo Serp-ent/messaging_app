@@ -422,7 +422,7 @@ describe('Login', () => {
 
 describe('GET /users', () => {
   let users = [];
-  beforeAll(async () => {
+  beforeEach(async () => {
     // Create three users for testing
     users = await Promise.all([
       prisma.user.create({
@@ -455,57 +455,107 @@ describe('GET /users', () => {
     ]);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await prisma.$executeRaw`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE`;
   })
 
-  it('should retrieve all users', async () => {
-    const response = await request(app)
-      .get('/user')
-      .expect(200);
+  describe('Receive all users', () => {
+    it('should retrieve all users', async () => {
+      const response = await request(app)
+        .get('/user')
+        .expect(200);
 
-    // TODO: add pagination
-    expect(response.body).toHaveProperty('status', 'success');
-    expect(response.body).toHaveProperty('users');
-    expect(Array.isArray(response.body.users)).toBeTruthy();
-    expect(response.body.users).toHaveLength(3);
+      // TODO: add pagination
+      expect(response.body).toHaveProperty('status', 'success');
+      expect(response.body).toHaveProperty('users');
+      expect(Array.isArray(response.body.users)).toBeTruthy();
+      expect(response.body.users).toHaveLength(3);
 
-    expect(response.body.users).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        id: expect.any(Number),
-        firstName: 'User',
-        lastName: 'One',
-        username: 'user1',
-        email: 'user1@example.com'
-      }),
-      expect.objectContaining({
-        id: expect.any(Number),
-        firstName: 'User',
-        lastName: 'Two',
-        username: 'user2',
-        email: 'user2@example.com'
-      }),
-      expect.objectContaining({
-        id: expect.any(Number),
-        firstName: 'User',
-        lastName: 'Three',
-        username: 'user3',
-        email: 'user3@example.com'
-      })
-    ]));
+      expect(response.body.users).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          id: expect.any(Number),
+          firstName: 'User',
+          lastName: 'One',
+          username: 'user1',
+          email: 'user1@example.com'
+        }),
+        expect.objectContaining({
+          id: expect.any(Number),
+          firstName: 'User',
+          lastName: 'Two',
+          username: 'user2',
+          email: 'user2@example.com'
+        }),
+        expect.objectContaining({
+          id: expect.any(Number),
+          firstName: 'User',
+          lastName: 'Three',
+          username: 'user3',
+          email: 'user3@example.com'
+        })
+      ]));
+    });
+
+    it('should return an empty array if no users exist', async () => {
+      // Delete all users to ensure the test runs on an empty database
+      await prisma.user.deleteMany({});
+
+      const response = await request(app)
+        .get('/user')
+        .expect(200);
+
+      expect(response.body).toHaveProperty('status', 'success');
+      expect(response.body).toHaveProperty('users');
+      expect(Array.isArray(response.body.users)).toBeTruthy();
+      expect(response.body.users).toHaveLength(0);
+    });
   });
 
-  it('should return an empty array if no users exist', async () => {
-    // Delete all users to ensure the test runs on an empty database
-    await prisma.user.deleteMany({});
+  describe('Receive user with given id', () => {
+    it('should retrieve a user by ID', async () => {
+      const response = await request(app)
+        .get(`/user/${users.at(0).id}`)
+        .expect(200);
 
-    const response = await request(app)
-      .get('/user')
-      .expect(200);
+      expect(response.body).toHaveProperty('status', 'success');
+      expect(response.body).toHaveProperty('user');
 
-    expect(response.body).toHaveProperty('status', 'success');
-    expect(response.body).toHaveProperty('users');
-    expect(Array.isArray(response.body.users)).toBeTruthy();
-    expect(response.body.users).toHaveLength(0);
+      const { password, ...want } = users.at(0);
+      expect(response.body.user).toMatchObject(want);
+    });
+
+    it('should retrieve a another user by ID', async () => {
+      const response = await request(app)
+        .get(`/user/${users.at(1).id}`)
+        .expect(200);
+
+      expect(response.body).toHaveProperty('status', 'success');
+      expect(response.body).toHaveProperty('user');
+
+      const { password, ...want } = users.at(1);
+      expect(response.body.user).toMatchObject(want);
+    });
+
+    it('should return 404 for a non-existent user', async () => {
+      const nonExistentId = 999999; // an ID that does not exist
+
+      const response = await request(app)
+        .get(`/user/${nonExistentId}`)
+        .expect(404);
+
+      expect(response.body).toHaveProperty('status', 'error');
+      expect(response.body).toHaveProperty('message', 'User not found');
+    });
+
+    it('should return 400 for invalid ID format', async () => {
+      const invalidId = 'abc123'; // non-numeric ID
+
+      const response = await request(app)
+        .get(`/user/${invalidId}`)
+        .expect(400);
+
+      expect(response.body).toHaveProperty('status', 'error');
+      expect(response.body).toHaveProperty('message', 'Invalid user ID format');
+    });
   });
 }) 
