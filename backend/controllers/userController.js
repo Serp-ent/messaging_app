@@ -141,8 +141,14 @@ const getUser = async (req, res) => {
   // Retrieve user details
 }
 
+const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await prisma.user.findMany({});
+  res.json({ status: 'success', users });
+});
+
 module.exports = {
   createUserChain,
   login,
   getUser,
+  getAllUsers,
 }

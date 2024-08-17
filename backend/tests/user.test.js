@@ -11,6 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/user', ...userController.createUserChain);
 app.post('/user/login', userController.login);
 app.get('/user/:id', userController.getUser);
+app.get('/user', userController.getAllUsers);
 
 app.use(errorHandler);
 
@@ -418,3 +419,93 @@ describe('Login', () => {
     expect(response.body).toHaveProperty('message', 'Incorrect username or password');
   })
 });
+
+describe('GET /users', () => {
+  let users = [];
+  beforeAll(async () => {
+    // Create three users for testing
+    users = await Promise.all([
+      prisma.user.create({
+        data: {
+          firstName: 'User',
+          lastName: 'One',
+          username: 'user1',
+          email: 'user1@example.com',
+          password: 'password123'
+        }
+      }),
+      prisma.user.create({
+        data: {
+          firstName: 'User',
+          lastName: 'Two',
+          username: 'user2',
+          email: 'user2@example.com',
+          password: 'password456'
+        }
+      }),
+      prisma.user.create({
+        data: {
+          firstName: 'User',
+          lastName: 'Three',
+          username: 'user3',
+          email: 'user3@example.com',
+          password: 'password789'
+        }
+      })
+    ]);
+  });
+
+  afterAll(async () => {
+    await prisma.$executeRaw`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE`;
+  })
+
+  it('should retrieve all users', async () => {
+    const response = await request(app)
+      .get('/user')
+      .expect(200);
+
+    // TODO: add pagination
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body).toHaveProperty('users');
+    expect(Array.isArray(response.body.users)).toBeTruthy();
+    expect(response.body.users).toHaveLength(3);
+
+    expect(response.body.users).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: expect.any(Number),
+        firstName: 'User',
+        lastName: 'One',
+        username: 'user1',
+        email: 'user1@example.com'
+      }),
+      expect.objectContaining({
+        id: expect.any(Number),
+        firstName: 'User',
+        lastName: 'Two',
+        username: 'user2',
+        email: 'user2@example.com'
+      }),
+      expect.objectContaining({
+        id: expect.any(Number),
+        firstName: 'User',
+        lastName: 'Three',
+        username: 'user3',
+        email: 'user3@example.com'
+      })
+    ]));
+  });
+
+  it('should return an empty array if no users exist', async () => {
+    // Delete all users to ensure the test runs on an empty database
+    await prisma.user.deleteMany({});
+
+    const response = await request(app)
+      .get('/user')
+      .expect(200);
+
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body).toHaveProperty('users');
+    expect(Array.isArray(response.body.users)).toBeTruthy();
+    expect(response.body.users).toHaveLength(0);
+  });
+}) 
