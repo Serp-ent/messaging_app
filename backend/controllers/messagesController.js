@@ -2,9 +2,26 @@ const asyncHandler = require('express-async-handler');
 const { BadRequestError, NotFoundError } = require('../error/errors');
 const prisma = require('../db/prismaClient');
 
-const getMessages = async (req, res) => {
-  // Retrieve all messages in a specific conversation
-}
+const getMessages = asyncHandler(async (req, res) => {
+  const conversationId = parseInt(req.params.id);
+  if (isNaN(conversationId) || conversationId < 0) {
+    throw new BadRequestError('Invalid conversation ID');
+  }
+
+  const conversation = await prisma.conversation.findUnique({
+    where: { id: conversationId },
+    include: { messages: true }
+  });
+
+  if (!conversation) {
+    throw new NotFoundError('Conversation not found');
+  }
+
+  res.json({
+    status: 'success',
+    messages: conversation.messages,
+  });
+})
 
 
 const sendMessage = asyncHandler(async (req, res) => {

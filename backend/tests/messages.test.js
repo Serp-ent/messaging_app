@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.post('/messages', messageController.sendMessage);
-// app.get('/conversations/:id/messages', controller.getMessages);
+app.get('/conversations/:id/messages', messageController.getMessages);
 
 app.use(errorHandler);
 
@@ -205,3 +205,97 @@ describe('POST /messages', () => {
 
   });
 });
+
+describe('GET /conversation/:id/messages', () => {
+  let conversation;
+  let messages;
+
+  beforeAll(async () => {
+    // Create a conversation between user1 and user2
+    conversation = await prisma.conversation.create({
+      data: {
+        participants: {
+          connect: [{ id: user1.id }, { id: user2.id }]
+        }
+      }
+    });
+
+    // Send three messages in the conversation
+    messages = await Promise.all([
+      prisma.message.create({
+        data: {
+          content: 'Hello from user1',
+          senderId: user1.id,
+          conversationId: conversation.id
+        }
+      }),
+      prisma.message.create({
+        data: {
+          content: 'Hello from user2',
+          senderId: user2.id,
+          conversationId: conversation.id
+        }
+      }),
+      prisma.message.create({
+        data: {
+          content: 'How are you?',
+          senderId: user1.id,
+          conversationId: conversation.id
+        }
+      })
+    ]);
+  })
+
+  it('should retrieve all messages in a conversation', async () => {
+    const response = await request(app)
+      .get(`/conversations/${conversation.id}/messages`)
+      .expect(200);
+
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body).toHaveProperty('messages');
+    expect(Array.isArray(response.body.messages)).toBeTruthy();
+    expect(response.body.messages).toHaveLength(3);
+
+    // Check if the messages match the expected messages
+    expect(response.body.messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        content: 'Hello from user1',
+        senderId: user1.id,
+        conversationId: conversation.id
+      }),
+      expect.objectContaining({
+        content: 'Hello from user2',
+        senderId: user2.id,
+        conversationId: conversation.id
+      }),
+      expect.objectContaining({
+        content: 'How are you?',
+        senderId: user1.id,
+        conversationId: conversation.id
+      })
+    ]));
+  });
+
+  it('should return 404 for a non-existent conversation', async () => {
+    // Use a non-existent conversation ID
+    const nonExistentConversationId = 999999;
+
+    const response = await request(app)
+      .get(`/conversations/${nonExistentConversationId}/messages`)
+      .expect(404);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body).toHaveProperty('message', 'Conversation not found');
+  });
+
+  it('should return 400 for an invalid conversationId (non-numeric)', async () => {
+    const invalidConversationId = 'invalid_id';
+
+    const response = await request(app)
+      .get(`/conversations/${invalidConversationId}/messages`)
+      .expect(400);
+
+    expect(response.body).toHaveProperty('status', 'error');
+    expect(response.body).toHaveProperty('message', 'Invalid conversation ID');
+  });
+})
