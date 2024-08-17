@@ -3,9 +3,9 @@ const controller = require('../controllers/userController');
 
 const usersRoute = Router();
 
-app.post('/api/users', controller.createUser);
-app.post('/api/auth/login', controller.login);
-app.get('/api/users/:id', controller.getUser);
+usersRoute.post('/api/users', controller.createUser);
+usersRoute.post('/api/auth/login', controller.login);
+usersRoute.get('/api/users/:id', controller.getUser);
 
 
 module.exports = usersRoute;
