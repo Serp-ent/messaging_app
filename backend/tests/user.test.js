@@ -8,7 +8,7 @@ const prisma = require('../db/prismaClient');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/user', userController.createUserChain);
+app.post('/user', ...userController.createUserChain);
 app.post('/user/login', userController.login);
 app.get('/user/:id', userController.getUser);
 

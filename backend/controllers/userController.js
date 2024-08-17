@@ -1,5 +1,6 @@
 const prisma = require('../db/prismaClient');
 const { body, validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
 
 const validateUserCreation = [
   body('firstName')
@@ -109,6 +110,7 @@ const createUserChain = [
 
 const login = async (req, res) => {
   const { username, password } = req.body;
+  // TODO: check if username and password are non null
 
   const user = await prisma.user.findUnique({
     where: { username, }
@@ -119,14 +121,17 @@ const login = async (req, res) => {
 
   // TODO: use bcrypt to compare hash
   // TODO: sign jwt token
+
   const isMatch = user.password === password;
   if (!isMatch) {
     return res.status(401).json({ status: 'Unauthorized', message: 'Incorrect username or password' });
   }
 
+  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
+
   return res.json({
     status: 'success',
-    token: "thisIsToken",
+    token,
   })
 }
 
