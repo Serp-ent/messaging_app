@@ -16,6 +16,8 @@ app.use(errorHandler);
 
 describe('User registration', () => {
   beforeEach(async () => {
+    // start clean
+    await prisma.$executeRaw`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE`;
     // const user = {
     //   firstName: 'name',
     //   lastName: 'surname',
@@ -79,18 +81,6 @@ describe('User registration', () => {
 
     expect(got).toMatchObject(want);
   })
-
-  // it('should return a 400 status if username or password is missing', async () => {
-  //   const incompleteUser = { username: '' };
-
-  //   const response = await request(app)
-  //     .post('/user')
-  //     .send(incompleteUser)
-  //     .expect(400);
-
-  //   expect(response.body).toHaveProperty('status', 'error');
-  //   expect(response.body).toHaveProperty('message');
-  // });
 
   it('should return a 409 status if the user username is in use', async () => {
     const existingUser = {
@@ -325,6 +315,96 @@ describe('User registration', () => {
       ])
     );
   });
-
-
 })
+
+describe('Login', () => {
+  beforeAll(async () => {
+    // add user
+    await prisma.user.createMany({
+      data: [
+        {
+          firstName: 'User1',
+          lastName: 'Last1',
+          username: 'user1',
+          email: 'user1@example.com',
+          password: 'Pass123', // In a real scenario, this should be hashed
+        },
+        {
+          firstName: 'User2',
+          lastName: 'Last2',
+          username: 'user2',
+          email: 'user2@example.com',
+          password: 'Pass456', // In a real scenario, this should be hashed
+        },
+      ],
+    });
+  })
+
+  afterAll(async () => {
+    await prisma.$executeRaw`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE`;
+  })
+
+  it('Should return token on successful login for first user', async () => {
+    const userCredentials = {
+      username: 'user1',
+      password: 'Pass123'
+    };
+
+    const response = await request(app)
+      .post('/user/login')
+      .send(userCredentials)
+      .expect(200);
+
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body).toHaveProperty('token');
+    expect(typeof response.body.token).toBe("string");
+    expect(response.body.token).not.toBe('');
+  })
+
+  it('Should return token on successful login for first user', async () => {
+    const userCredentials = {
+      username: 'user2',
+      password: 'Pass456'
+    };
+
+    const response = await request(app)
+      .post('/user/login')
+      .send(userCredentials)
+      .expect(200);
+
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body).toHaveProperty('token');
+    expect(typeof response.body.token).toBe("string");
+    expect(response.body.token).not.toBe('');
+  })
+
+  it('Should return 401 for incorrect username', async () => {
+    const userCredentials = {
+      username: 'incorrectUserName',
+      password: 'Pass456'
+    };
+
+    const response = await request(app)
+      .post('/user/login')
+      .send(userCredentials)
+      .expect(401);
+
+    expect(response.body).toHaveProperty("status", 'Unauthorized');
+    expect(response.body).toHaveProperty('message', 'Incorrect username or password');
+  })
+
+  it('Should return 401 for incorrect password', async () => {
+    const userCredentials = {
+      username: 'user1',
+      password: 'Pass456'
+    };
+
+    const response = await request(app)
+      .post('/user/login')
+      .send(userCredentials)
+      .expect(401);
+
+    expect(response.body).toHaveProperty("status", 'Unauthorized');
+    expect(response.body).toHaveProperty('message', 'Incorrect username or password');
+  })
+});

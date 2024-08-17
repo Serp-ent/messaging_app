@@ -108,7 +108,26 @@ const createUserChain = [
 
 
 const login = async (req, res) => {
-  // Authenticate a user and return a token
+  const { username, password } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: { username, }
+  });
+  if (!user) {
+    return res.status(401).json({ status: 'Unauthorized', message: 'Incorrect username or password' });
+  }
+
+  // TODO: use bcrypt to compare hash
+  // TODO: sign jwt token
+  const isMatch = user.password === password;
+  if (!isMatch) {
+    return res.status(401).json({ status: 'Unauthorized', message: 'Incorrect username or password' });
+  }
+
+  return res.json({
+    status: 'success',
+    token: "thisIsToken",
+  })
 }
 
 
