@@ -1,7 +1,7 @@
 .mainContainer {
   display: grid;
   grid-template-columns: 1fr 3fr 1fr;
-  gap: 16px;
+  gap: 4px;
   height: 100vh;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .main {
-  background-color: blue;
+  background-color: rgb(136, 136, 243);
 }
 
 .menuButton {
@@ -47,11 +47,15 @@
   align-items: center;
 }
 
+.conversationList li {
+  width: 95%;
+}
+
 .conversation {
   box-sizing: border-box;
   border: 1px solid black;
-  width: 94%;
   padding: 8px;
+  width: 100%;
   background-color: white;
   align-items: center;
   justify-content: space-between;

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import styles from './Home.module.css';
 
-export default function SidebarLeft() {
-  const [conversations, setConversations] = useState([]);
+export default function SidebarLeft({ onConversationSelect }) {
+  const [conversationsShort, setConversationsShort] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -24,7 +24,7 @@ export default function SidebarLeft() {
         }
 
         const data = await response.json();
-        setConversations(data.conversations || []);
+        setConversationsShort(data.conversations || []);
       } catch (error) {
         console.error('Error fetching conversations:', error);
         setError(error.message);
@@ -46,13 +46,18 @@ export default function SidebarLeft() {
 
   return (
     <ul className={styles.conversationList}>
-      {conversations.map((conversation) => (
-        <li key={conversation.id} className={styles.conversation}>
-          <div className={styles.userInfo}>
-            <div className={styles.conversationAvatar}></div>
-            <div>{conversation.name || 'No Name'}</div>
-          </div>
-          <div>{conversation.messages.length > 0 ? conversation.messages[0].content : 'No messages'}</div>
+      {conversationsShort.map((conversation) => (
+        <li key={conversation.id} >
+          <button
+            onClick={() => onConversationSelect(conversation.id)}
+            className={styles.conversation}
+          >
+            <div className={styles.userInfo}>
+              <div className={styles.conversationAvatar}></div>
+              <div>{conversation.name || 'No Name'}</div>
+            </div>
+            <div>{conversation.messages.length > 0 ? conversation.messages[0].content : 'No messages'}</div>
+          </button>
         </li>
       ))}
     </ul>

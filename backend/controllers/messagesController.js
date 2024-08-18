@@ -4,13 +4,37 @@ const prisma = require('../db/prismaClient');
 
 const getMessages = asyncHandler(async (req, res) => {
   const conversationId = parseInt(req.params.id);
+  const limit = parseInt(req.query.limit) || 20; // Number of messages per page
+  const page = parseInt(req.query.page) || 1; // Page number
+
   if (isNaN(conversationId) || conversationId < 0) {
     throw new BadRequestError('Invalid conversation ID');
   }
 
+  const cursor = (page - 1) * limit;
+
   const conversation = await prisma.conversation.findUnique({
     where: { id: conversationId },
-    include: { messages: true }
+    include: {
+      messages: {
+        orderBy: {
+          timestamp: 'desc' // Sort messages in descending order to get the latest first
+        },
+        take: limit,
+        skip: cursor,
+        include: {
+          sender: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              username: true,
+              email: true
+            }
+          }
+        }
+      }
+    },
   });
 
   if (!conversation) {
@@ -20,9 +44,10 @@ const getMessages = asyncHandler(async (req, res) => {
   res.json({
     status: 'success',
     messages: conversation.messages,
+    page,
+    limit,
   });
-})
-
+});
 
 const sendMessage = asyncHandler(async (req, res) => {
   // Send a new message in a conversation
