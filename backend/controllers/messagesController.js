@@ -4,7 +4,7 @@ const prisma = require('../db/prismaClient');
 
 const getMessages = asyncHandler(async (req, res) => {
   const conversationId = parseInt(req.params.id);
-  const limit = 2 // parseInt(req.query.limit) || 20; // Number of messages per page
+  const limit = parseInt(req.query.limit) || 20; // Number of messages per page
   const page = parseInt(req.query.page) || 1; // Page number
 
   if (isNaN(conversationId) || conversationId < 0) {

@@ -2,7 +2,6 @@
   display: grid;
   grid-template-columns: 1fr 3fr 1fr;
   gap: 4px;
-  height: 100vh;
 }
 
 .sidebarLeft {
@@ -15,8 +14,13 @@
 }
 
 .main {
+}
+
+.messages {
   background-color: rgb(136, 136, 243);
   padding: 16px;
+  overflow-y: auto;
+  height: 80vh;
 }
 
 .messageBubble {

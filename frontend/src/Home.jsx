@@ -38,7 +38,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [messageContent, setMessageContent] = useState('');
-  const limit = 20;
+  const limit = 10;
 
   const sendMessage = async () => {
     if (!messageContent.trim() || !setSelectedConversation) {
@@ -86,7 +86,7 @@ export default function Home() {
       // Reverse the new messages before prepending to ensure the newest are at the bottom
       // console.log('newMessages:', newMessages.reverse());
       newMessages.reverse();
-      setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+      setMessages((prevMessages) => [...newMessages, ...prevMessages]);
     }
   };
 
@@ -103,6 +103,7 @@ export default function Home() {
   };
 
   const handleScroll = async (e) => {
+    console.log('Scrolled:', e.target.scrollTop);
     if (e.target.scrollTop === 0 && hasMoreMessages) {
       const nextPage = page + 1;
       await loadMessages(selectedConversation, nextPage);
@@ -128,17 +129,21 @@ export default function Home() {
 
       </aside>
 
-      <main className={styles.main} onScroll={handleScroll}>
-        {messages.map((message) => (
-          <div key={message.id}
-            className={`${styles.messageBubble} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}>
-            <div>
-              <time dateTime={message.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
-              <div className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</div>
-              <p>{message.content}</p>
+      <main className={styles.main}>
+        <div className={styles.messages} onScroll={handleScroll}>
+          {!selectedConversation && <div>Select a conversation to view messages</div>}
+          {messages.map((message) => (
+            <div key={message.id}
+              className={`${styles.messageBubble} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}>
+              <div>
+                <time dateTime={message.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
+                <div className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</div>
+                <p>{message.content}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+
+        </div>
         {selectedConversation && (
           <div className={styles.messageInput}>
             <textarea
@@ -149,8 +154,6 @@ export default function Home() {
             <button onClick={sendMessage}>Send</button>
           </div>
         )}
-
-        {!selectedConversation && <div>Select a conversation to view messages</div>}
       </main>
 
       {/* Menu Button for narrow screens */}
