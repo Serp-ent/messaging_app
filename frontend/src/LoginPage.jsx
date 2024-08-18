@@ -5,9 +5,7 @@ import { useState } from "react";
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     username: '',
-    email: '',
     password: '',
-    confirmPassword: '',
   });
 
   const [error, setError] = useState('');
@@ -24,21 +22,24 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords don't match!");
+    console.log('formData:', JSON.stringify(formData));
+
+    const response = await fetch('http://localhost:3000/api/users/login', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (response.status !== 200) {
+      console.log(response);
       return;
     }
 
-    // Here you would typically send `formData` to the server to register the user.
-    try {
-      // Simulate a successful registration (you would replace this with an actual API call)
-      const fakeToken = 'fake-jwt-token';
-      login(fakeToken); // Login after registration
-      navigate('/'); // Redirect to home page after successful registration
-    } catch (err) {
-      setError('Registration failed. Please try again.');
-    }
+    const result = await response.json();
+    login(result.token);
+    navigate('/');
   };
 
   return (

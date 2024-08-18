@@ -148,9 +148,11 @@ const getUser = asyncHandler(async (req, res) => {
     throw new NotFoundError('User not found');
   }
 
+  // TODO: test to not include password
+  const {password, ...userWithoutPassword} = user;
   res.json({
     status: 'success',
-    user,
+    user: userWithoutPassword,
   });
 });
 
