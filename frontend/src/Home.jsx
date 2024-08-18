@@ -53,11 +53,16 @@ export default function Home() {
       setHasMoreMessages(false);
     } else {
       // Reverse the new messages before prepending to ensure the newest are at the bottom
-      setMessages([...messages, ...newMessages.reverse()]);
+      setMessages((prevMessages) => [...prevMessages, ...newMessages.reverse()]);
     }
   };
 
   const handleLoadConversation = async (id) => {
+    if (selectedConversation === id) {
+      console.log("Loading the same conversation")
+      return;
+    }
+
     setSelectedConversation(id);
     setMessages([]);
     setPage(1);
@@ -72,8 +77,6 @@ export default function Home() {
       setPage(nextPage);
     }
   };
-
-  console.log('messages:', messages);
 
   return (
     <div className={styles.mainContainer}>
