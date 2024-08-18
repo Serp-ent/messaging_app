@@ -5,16 +5,6 @@ import SidebarRight from './SidebarRight';
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSidebar, setActiveSidebar] = useState('conversations');
-  const [isWideScreen, setIsWideScreen] = useState(window.innerWidth > 1024);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsWideScreen(window.innerWidth > 1024);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -28,7 +18,11 @@ export default function Home() {
     <div className={styles.mainContainer}>
       {/* Left Sidebar: Conversations and Users */}
       <aside className={`${styles.sidebarLeft} ${isMenuOpen ? styles.open : ''}`}>
-        {(!isWideScreen && activeSidebar === 'conversations') || isWideScreen ? (
+        <button className={styles.switchSidebarButton} onClick={toggleActiveSidebar}>
+          Switch to {activeSidebar === 'conversations' ? 'Users' : 'Conversations'}
+        </button>
+
+        {(activeSidebar === 'conversations') ? (
           <ul className={styles.conversationList}>
             <li className={styles.conversation}>
               <div className={styles.userInfo}>
@@ -47,29 +41,10 @@ export default function Home() {
           </ul>
         ) : null}
 
-        {!isWideScreen && activeSidebar === 'users' ? (
-          <ul className={styles.userList}>
-            <li className={styles.user}>
-              <div className={styles.userItem}>
-                <div className={styles.userAvatar}></div>
-                <div>User Name</div>
-              </div>
-            </li>
-            <li className={styles.user}>
-              <div className={styles.userItem}>
-                <div className={styles.userAvatar}></div>
-                <div>User Name</div>
-              </div>
-            </li>
-          </ul>
+        {activeSidebar === 'users' ? (
+          <SidebarRight />
         ) : null}
 
-        {/* Button to switch between Conversations and Users (Only on medium and small screens) */}
-        {!isWideScreen && (
-          <button className={styles.switchSidebarButton} onClick={toggleActiveSidebar}>
-            Switch to {activeSidebar === 'conversations' ? 'Users' : 'Conversations'}
-          </button>
-        )}
       </aside>
 
       {/* Main Content */}
@@ -86,8 +61,6 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Right Sidebar: Users (Always visible on wide screens) */}
-      {isWideScreen && <SidebarRight />}
 
       {/* Menu Button for narrow screens */}
       <button className={styles.menuButton} onClick={toggleMenu}>

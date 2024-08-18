@@ -11,7 +11,6 @@ export default function Header() {
   useEffect(() => {
     if (userAuth) {
       const fetchUserData = async () => {
-        console.log('fetching for user', userAuth);
         setLoading(true); // Start loading
         try {
           const response = await fetch(`http://localhost:3000/api/users/${userAuth.id}`);
