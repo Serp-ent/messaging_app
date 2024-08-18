@@ -1,4 +1,5 @@
 import { useContext, useState, useEffect, createContext } from 'react';
+import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
@@ -17,8 +18,8 @@ export default function AuthProvider({ children }) {
 
   const login = (token) => {
     localStorage.setItem('authToken', token);
-    const decodedUser = { id: 1 };
-    setUser(decodedUser);
+    const decodedToken = jwtDecode(token);
+    setUser(decodedToken);
     navigate('/');
   };
 

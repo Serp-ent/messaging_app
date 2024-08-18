@@ -118,6 +118,7 @@ const login = asyncHandler(async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { username, }
   });
+
   if (!user) {
     throw new UnauthorizedError('Incorrect username or password');
   }
@@ -128,7 +129,7 @@ const login = asyncHandler(async (req, res) => {
     throw new UnauthorizedError('Incorrect username or password');
   }
 
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
+  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
   res.json({
     status: 'success',
@@ -149,7 +150,7 @@ const getUser = asyncHandler(async (req, res) => {
   }
 
   // TODO: test to not include password
-  const {password, ...userWithoutPassword} = user;
+  const { password, ...userWithoutPassword } = user;
   res.json({
     status: 'success',
     user: userWithoutPassword,
