@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './Home.module.css';
 import SidebarRight from './SidebarRight';
 import SidebarLeft from './SidebarLeft';
@@ -28,7 +28,6 @@ async function fetchMessages(conversationId, page = 1, limit = 20) {
   }
 }
 
-
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSidebar, setActiveSidebar] = useState('conversations');
@@ -38,10 +37,15 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [messageContent, setMessageContent] = useState('');
+  const [showScrollButton, setShowScrollButton] = useState(false); // State to control the scroll button visibility
   const limit = 10;
 
+  // Refs for scrolling
+  const lastMessageRef = useRef(null);
+  const messagesEndRef = useRef(null); // Ref to scroll to the bottom
+
   const sendMessage = async () => {
-    if (!messageContent.trim() || !setSelectedConversation) {
+    if (!messageContent.trim() || !selectedConversation) {
       return;
     }
 
@@ -62,9 +66,11 @@ export default function Home() {
       }
 
       const result = await response.json();
-      // Update messages state with the new message
       setMessages(prevMessages => [...prevMessages, result.message]);
       setMessageContent(''); // Clear the input after sending
+
+      // Scroll to the new message
+      lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       console.log(err);
     }
@@ -83,8 +89,6 @@ export default function Home() {
     if (newMessages.length === 0) {
       setHasMoreMessages(false);
     } else {
-      // Reverse the new messages before prepending to ensure the newest are at the bottom
-      // console.log('newMessages:', newMessages.reverse());
       newMessages.reverse();
       setMessages((prevMessages) => [...newMessages, ...prevMessages]);
     }
@@ -100,15 +104,30 @@ export default function Home() {
     setPage(1);
     setHasMoreMessages(true);
     await loadMessages(id, 1);
+
+    // After loading the messages, scroll to the bottom
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    }, 0);
   };
 
-  const handleScroll = async (e) => {
-    console.log('Scrolled:', e.target.scrollTop);
+  const handleScroll = (e) => {
     if (e.target.scrollTop === 0 && hasMoreMessages) {
       const nextPage = page + 1;
-      await loadMessages(selectedConversation, nextPage);
+      loadMessages(selectedConversation, nextPage);
       setPage(nextPage);
     }
+
+    // Show or hide the scroll button based on the scroll position
+    if (e.target.scrollHeight - e.target.scrollTop > e.target.clientHeight + 100) {
+      setShowScrollButton(true);
+    } else {
+      setShowScrollButton(false);
+    }
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -132,9 +151,10 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.messages} onScroll={handleScroll}>
           {!selectedConversation && <div>Select a conversation to view messages</div>}
-          {messages.map((message) => (
+          {messages.map((message, index) => (
             <div key={message.id}
-              className={`${styles.messageBubble} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}>
+              className={`${styles.messageBubble} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}
+              ref={index === messages.length - 1 ? lastMessageRef : null}>
               <div>
                 <time dateTime={message.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
                 <div className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</div>
@@ -142,7 +162,8 @@ export default function Home() {
               </div>
             </div>
           ))}
-
+          {/* Dummy div to mark the end of the messages for scrolling */}
+          <div ref={messagesEndRef} />
         </div>
         {selectedConversation && (
           <div className={styles.messageInput}>
@@ -153,6 +174,12 @@ export default function Home() {
             />
             <button onClick={sendMessage}>Send</button>
           </div>
+        )}
+        {/* Scroll to Bottom Button */}
+        {showScrollButton && (
+          <button className={styles.scrollButton} onClick={scrollToBottom}>
+            Scroll to Bottom
+          </button>
         )}
       </main>
 
