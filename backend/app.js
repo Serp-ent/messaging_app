@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/users', usersRoute);
 app.use('/api/messages', messagesRoute);
-app.use('/api/conversation', conversationsRoute);
+app.use('/api/conversations', conversationsRoute);
 
 app.use(errorHandler);
 

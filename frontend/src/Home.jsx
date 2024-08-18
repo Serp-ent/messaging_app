@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from './Home.module.css';
 import SidebarRight from './SidebarRight';
+import SidebarLeft from './SidebarLeft';
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,22 +24,7 @@ export default function Home() {
         </button>
 
         {(activeSidebar === 'conversations') ? (
-          <ul className={styles.conversationList}>
-            <li className={styles.conversation}>
-              <div className={styles.userInfo}>
-                <div className={styles.conversationAvatar}></div>
-                <div>Name Surname</div>
-              </div>
-              <div>Last message</div>
-            </li>
-            <li className={styles.conversation}>
-              <div className={styles.userInfo}>
-                <div className={styles.conversationAvatar}></div>
-                <div>Name Surname</div>
-              </div>
-              <div>Last message</div>
-            </li>
-          </ul>
+          <SidebarLeft />
         ) : null}
 
         {activeSidebar === 'users' ? (
