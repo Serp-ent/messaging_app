@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styles from './Home.module.css';
 import SidebarRight from './SidebarRight';
 import SidebarLeft from './SidebarLeft';
+import { useAuth } from './AuthContext';
 
 async function fetchMessages(conversationId, page = 1, limit = 20) {
   const authToken = localStorage.getItem('authToken');
@@ -32,6 +33,7 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSidebar, setActiveSidebar] = useState('conversations');
   const [selectedConversation, setSelectedConversation] = useState(null);
+  const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
@@ -93,10 +95,13 @@ export default function Home() {
 
       <main className={styles.main} onScroll={handleScroll}>
         {messages.map((message) => (
-          <div key={message.id} className={styles.messageBubble}>
-            <span className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</span>
-            <p>{message.content}</p>
-            <time dateTime={message.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
+          <div key={message.id}
+            className={`${styles.messageBubble} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}>
+            <div>
+              <span className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</span>
+              <p>{message.content}</p>
+              <time dateTime={message.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
+            </div>
           </div>
         ))}
         {!selectedConversation && <div>Select a conversation to view messages</div>}

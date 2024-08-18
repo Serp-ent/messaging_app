@@ -16,6 +16,24 @@
 
 .main {
   background-color: rgb(136, 136, 243);
+  padding: 16px;
+}
+
+.messageBubble {
+  display: flex;
+  border-radius: 16px;
+  padding: 8px;
+}
+
+.messageSend {
+  background-color: lightblue;
+  justify-content: flex-end;
+
+}
+
+.messageReceived {
+  background-color: gray;
+  justify-content: flex-start;
 }
 
 .menuButton {
