@@ -41,7 +41,6 @@ export default function Home() {
   const limit = 10;
 
   // Refs for scrolling
-  const lastMessageRef = useRef(null);
   const messagesEndRef = useRef(null); // Ref to scroll to the bottom
 
   const sendMessage = async () => {
@@ -68,13 +67,17 @@ export default function Home() {
       const result = await response.json();
       setMessages(prevMessages => [...prevMessages, result.message]);
       setMessageContent(''); // Clear the input after sending
-
-      // Scroll to the new message
-      lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       console.log(err);
     }
   }
+
+  useEffect(() => {
+    // Scroll to the latest message whenever messages change
+    if (messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -151,10 +154,9 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.messages} onScroll={handleScroll}>
           {!selectedConversation && <div>Select a conversation to view messages</div>}
-          {messages.map((message, index) => (
+          {messages.map((message) => (
             <div key={message.id}
-              className={`${styles.messageBubble} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}
-              ref={index === messages.length - 1 ? lastMessageRef : null}>
+              className={`${styles.messageBubble} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}>
               <div>
                 <time dateTime={message.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
                 <div className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</div>
