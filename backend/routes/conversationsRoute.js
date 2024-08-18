@@ -2,6 +2,7 @@ const { Router } = require('express');
 const passport = require('../config/passport-config');
 const controller = require('../controllers/conversationController');
 const messageController = require('../controllers/messagesController');
+const { message } = require('../db/prismaClient');
 
 const conversationsRoute = Router();
 
@@ -12,5 +13,9 @@ conversationsRoute.get('/',
   controller.getConversationsForUser);
 
 conversationsRoute.get('/:id', messageController.getMessages);
+
+conversationsRoute.post('/:id',
+  passport.authenticate('jwt', { session: false }),
+  messageController.sendMessage);
 
 module.exports = conversationsRoute;

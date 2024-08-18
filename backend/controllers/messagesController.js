@@ -4,7 +4,7 @@ const prisma = require('../db/prismaClient');
 
 const getMessages = asyncHandler(async (req, res) => {
   const conversationId = parseInt(req.params.id);
-  const limit = parseInt(req.query.limit) || 20; // Number of messages per page
+  const limit = 2 // parseInt(req.query.limit) || 20; // Number of messages per page
   const page = parseInt(req.query.page) || 1; // Page number
 
   if (isNaN(conversationId) || conversationId < 0) {
@@ -51,58 +51,70 @@ const getMessages = asyncHandler(async (req, res) => {
 
 const sendMessage = asyncHandler(async (req, res) => {
   // Send a new message in a conversation
-  const { from, to, content } = req.body;
-  if (!from || !to || !content) {
-    throw new BadRequestError('From, to, and content are required');
-  }
+  const { id } = req.query;
+  const conversationId = parseInt(req.params.id);
 
-  const [sender, receiver] = await Promise.all([
-    // TODO: handle parsing int
-    prisma.user.findUnique({ where: { id: parseInt(from, 10) } }),
-    prisma.user.findUnique({ where: { id: parseInt(to, 10) } })
-  ]);
+  const { content } = req.body;
+  // const { from, to, content } = req.body;
+  // if (!from || !to || !content) {
+  //   throw new BadRequestError('From, to, and content are required');
+  // }
 
-  if (!sender || !receiver) {
-    const user = (!sender) ? 'Sender' : 'Receiver';
-    throw new NotFoundError(`${user} not found`);
-  }
+  // const [sender, receiver] = await Promise.all([
+  //   // TODO: handle parsing int
+  //   prisma.user.findUnique({ where: { id: parseInt(from, 10) } }),
+  //   prisma.user.findUnique({ where: { id: parseInt(to, 10) } })
+  // ]);
 
-  let conversation = await prisma.conversation.findFirst({
-    where: {
-      participants: {
-        every: {
-          id: {
-            in: [parseInt(from, 10), parseInt(to, 10)],
-          }
-        }
-      }
-    }
-  });
+  // if (!sender || !receiver) {
+  //   const user = (!sender) ? 'Sender' : 'Receiver';
+  //   throw new NotFoundError(`${user} not found`);
+  // }
 
-  if (!conversation) {
-    // create new conversation if it does not exists
-    conversation = await prisma.conversation.create({
-      data: {
-        participants: {
-          connect: [
-            { id: parseInt(from, 10) },
-            { id: parseInt(to, 10) }
-          ]
-        }
-      }
-    });
-  }
+  // let conversation = await prisma.conversation.findFirst({
+  //   where: {
+  //     participants: {
+  //       every: {
+  //         id: {
+  //           in: [parseInt(from, 10), parseInt(to, 10)],
+  //         }
+  //       }
+  //     }
+  //   }
+  // });
+
+  // if (!conversation) {
+  //   // create new conversation if it does not exists
+  //   conversation = await prisma.conversation.create({
+  //     data: {
+  //       participants: {
+  //         connect: [
+  //           { id: parseInt(from, 10) },
+  //           { id: parseInt(to, 10) }
+  //         ]
+  //       }
+  //     }
+  //   });
+  // }
 
 
   // Add the message to the conversation
   const message = await prisma.message.create({
     data: {
       content,
-      senderId: parseInt(from, 10),
-      conversationId: conversation.id,
+      senderId: req.user.id,
+      conversationId: conversationId,
+    },
+    include: {
+      sender: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        }
+      }
     }
   });
-
 
   res.status(201).json({ status: 'success', message });
 });

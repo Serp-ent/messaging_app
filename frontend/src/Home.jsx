@@ -37,7 +37,38 @@ export default function Home() {
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [messageContent, setMessageContent] = useState('');
   const limit = 20;
+
+  const sendMessage = async () => {
+    if (!messageContent.trim() || !setSelectedConversation) {
+      return;
+    }
+
+    const authToken = localStorage.getItem('authToken');
+    try {
+      const response = await fetch(`http://localhost:3000/api/conversations/${selectedConversation}`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ content: messageContent })
+      });
+
+      if (!response.ok) {
+        console.error(response);
+        return;
+      }
+
+      const result = await response.json();
+      // Update messages state with the new message
+      setMessages(prevMessages => [...prevMessages, result.message]);
+      setMessageContent(''); // Clear the input after sending
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -53,13 +84,14 @@ export default function Home() {
       setHasMoreMessages(false);
     } else {
       // Reverse the new messages before prepending to ensure the newest are at the bottom
-      setMessages((prevMessages) => [...prevMessages, ...newMessages.reverse()]);
+      // console.log('newMessages:', newMessages.reverse());
+      newMessages.reverse();
+      setMessages((prevMessages) => [...prevMessages, ...newMessages]);
     }
   };
 
   const handleLoadConversation = async (id) => {
     if (selectedConversation === id) {
-      console.log("Loading the same conversation")
       return;
     }
 
@@ -101,12 +133,23 @@ export default function Home() {
           <div key={message.id}
             className={`${styles.messageBubble} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}>
             <div>
-              <span className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</span>
-              <p>{message.content}</p>
               <time dateTime={message.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
+              <div className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</div>
+              <p>{message.content}</p>
             </div>
           </div>
         ))}
+        {selectedConversation && (
+          <div className={styles.messageInput}>
+            <textarea
+              value={messageContent}
+              onChange={(e) => setMessageContent(e.target.value)}
+              placeholder='Send a message'
+            />
+            <button onClick={sendMessage}>Send</button>
+          </div>
+        )}
+
         {!selectedConversation && <div>Select a conversation to view messages</div>}
       </main>
 
