@@ -41,7 +41,8 @@ export default function Home() {
   const limit = 10;
 
   // Refs for scrolling
-  const messagesEndRef = useRef(null); // Ref to scroll to the bottom
+  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null); // Ref to the messages container for precise scroll control
 
   const sendMessage = async () => {
     if (!messageContent.trim() || !selectedConversation) {
@@ -67,13 +68,16 @@ export default function Home() {
       const result = await response.json();
       setMessages(prevMessages => [...prevMessages, result.message]);
       setMessageContent(''); // Clear the input after sending
+
+      // Scroll to the new message
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       console.log(err);
     }
   }
 
   useEffect(() => {
-    // Scroll to the latest message whenever messages change
+    // Scroll to the latest message whenever messages change (new message sent)
     if (messages.length > 0) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
@@ -92,8 +96,21 @@ export default function Home() {
     if (newMessages.length === 0) {
       setHasMoreMessages(false);
     } else {
+      // Calculate the scroll height before new messages are added
+      const scrollHeightBefore = messagesContainerRef.current.scrollHeight;
+
+      // Reverse and prepend the new messages
       newMessages.reverse();
       setMessages((prevMessages) => [...newMessages, ...prevMessages]);
+
+      // Calculate the difference in scroll height after messages are added
+      setTimeout(() => {
+        const scrollHeightAfter = messagesContainerRef.current.scrollHeight;
+        const scrollDifference = scrollHeightAfter - scrollHeightBefore;
+
+        // Adjust the scroll position to maintain the user's position
+        messagesContainerRef.current.scrollTop += scrollDifference;
+      }, 0);
     }
   };
 
@@ -152,7 +169,11 @@ export default function Home() {
       </aside>
 
       <main className={styles.main}>
-        <div className={styles.messages} onScroll={handleScroll}>
+        <div
+          className={styles.messages}
+          onScroll={handleScroll}
+          ref={messagesContainerRef} // Attach the ref to the messages container
+        >
           {!selectedConversation && <div>Select a conversation to view messages</div>}
           {messages.map((message) => (
             <div key={message.id}
