@@ -6,31 +6,43 @@ const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (token) {
-      const decodedUser = { id: 1 };
-      setUser(decodedUser);
+      try {
+        const decodedUser = jwtDecode(token);
+        setUser(decodedUser);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+        localStorage.removeItem('authToken');
+        setUser(null);
+        navigate('/login');
+      }
     }
-  }, []);
+
+    setLoading(false);
+  }, [navigate]);
 
   const login = (token) => {
     localStorage.setItem('authToken', token);
     const decodedToken = jwtDecode(token);
     setUser(decodedToken);
+    setLoading(false);
     navigate('/');
   };
 
   const logout = () => {
     localStorage.removeItem('authToken');
     setUser(null);
+    setLoading(false);
     navigate('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

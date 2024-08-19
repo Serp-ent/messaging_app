@@ -40,7 +40,11 @@ export default function Header() {
           ) : (
             user && (
               <>
-                <div>{user.firstName} {user.lastName}</div>
+                <div>
+                  <Link to={`/profile`}>
+                    {user.firstName} {user.lastName}
+                  </Link>
+                </div>
                 <div className={styles.userAvatar}></div>
                 <button onClick={logout}>Logout</button>
               </>

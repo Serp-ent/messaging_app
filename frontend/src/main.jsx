@@ -5,12 +5,12 @@ import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import ErrorPage from './ErrorPage.jsx'
 import AuthProvider from './AuthContext.jsx'
-import Profile from './Profile.jsx'
 import Home from './Home.jsx'
 import LoginPage from './LoginPage.jsx'
 import RegisterPage from './RegisterPage.jsx'
 import ProtectedRoute from './ProtectedRoute.jsx'
 import AuthRedirect from './AuthRedirect.jsx'
+import Profile from './Profile.jsx'
 
 const router = createBrowserRouter([
   {
@@ -26,12 +26,14 @@ const router = createBrowserRouter([
         path: 'profile',
         children: [
           {
-            path: ':id',
-            element: <ProtectedRoute element={<Profile />} />,
+            index: true,
+            element: <ProtectedRoute element={<Profile/>}></ProtectedRoute>
+            // element: <Profile />
           },
           {
-            path: '',
-            element: <ProtectedRoute element={<Profile />} />,
+            path: ':id',
+            element: <ProtectedRoute element={<Profile/>}></ProtectedRoute>
+            // element: <Profile />
           }
         ]
       },

@@ -7,8 +7,6 @@ const getConversationWithUser = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
   try {
-    console.log('Searching for private conversation between %d and %d', userId, otherUserId);
-
     // Fetch all conversations involving the current user
     let conversation = await prisma.conversation.findFirst({
       where: {
