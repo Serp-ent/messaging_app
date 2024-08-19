@@ -137,6 +137,24 @@ const login = asyncHandler(async (req, res) => {
   })
 });
 
+const updateUser = asyncHandler(async (req, res) => {
+  const user = await prisma.user.update({
+    where: { id: req.user.id },
+    data: {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+    },
+    select: {
+      email: true,
+      firstName: true,
+      id: true,
+      lastName: true,
+      username: true,
+    }
+  });
+
+  res.json({ status: 'success', user });
+})
 
 const getUser = asyncHandler(async (req, res) => {
   const userId = parseInt(req.params.id, 10);
@@ -167,4 +185,5 @@ module.exports = {
   login,
   getUser,
   getAllUsers,
+  updateUser,
 }
