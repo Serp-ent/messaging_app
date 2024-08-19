@@ -9,8 +9,9 @@ const prisma = new PrismaClient({
   datasources: {
     db: {
       url: databaseUrl,
-    }
-  }
+    },
+  },
+  // log: ['query', 'info', 'warn', 'error'],
 });
 
 module.exports = prisma;

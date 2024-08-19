@@ -14,7 +14,7 @@ conversationsRoute.get('/',
 
 conversationsRoute.get('/private/:id',
   passport.authenticate('jwt', { session: false }),
-  messageController.getConversationNumber);
+  messageController.getConversationWithUser);
 
 conversationsRoute.get('/:id', messageController.getMessages);
 

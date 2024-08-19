@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler');
 const { BadRequestError, NotFoundError } = require('../error/errors');
 const prisma = require('../db/prismaClient');
 
-const getConversationNumber = asyncHandler(async (req, res) => {
+const getConversationWithUser = asyncHandler(async (req, res) => {
   const otherUserId = parseInt(req.params.id);
   const userId = req.user.id;
 
@@ -10,31 +10,42 @@ const getConversationNumber = asyncHandler(async (req, res) => {
     console.log('Searching for private conversation between %d and %d', userId, otherUserId);
 
     // Fetch all conversations involving the current user
-    const conversations = await prisma.conversation.findMany({
+    let conversation = await prisma.conversation.findFirst({
       where: {
+        type: 'PRIVATE',
         participants: {
-          some: {
-            id: userId,
+          every: {
+            id: {
+              in: [userId, otherUserId],
+            },
           },
         },
       },
       include: {
         participants: true,
-      },
+      }
     });
 
-    // Filter the conversations to find one with exactly two participants (private conversation)
-    const privateConversation = conversations.find(
-      (conversation) =>
-        conversation.participants.length === 2 &&
-        conversation.participants.some((p) => p.id === otherUserId)
-    );
-
-    if (privateConversation) {
-      res.json({ conversationId: privateConversation.id });
-    } else {
-      res.status(404).json({ message: 'Conversation not found' });
+    if (!conversation) {
+      console.log('No conversation between these users');
+      res.json({ msg: 'no conversation with given id' });
+      return;
+      // conversation = await prisma.conversation.create({
+      //   data: {
+      //     type: 'PRIVATE', // Set the type to 'PRIVATE'
+      //     participants: {
+      //       connect: [{ id: userId }, { id: otherUserId }],
+      //     },
+      //   },
+      //   include: {
+      //     participants: true,
+      //   },
+      // });
     }
+
+    console.log("Conversation found");
+
+    res.json({ conversationId: conversation.id });
   } catch (error) {
     console.error('Error finding conversation:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -90,7 +101,6 @@ const getMessages = asyncHandler(async (req, res) => {
 
 const sendMessage = asyncHandler(async (req, res) => {
   // Send a new message in a conversation
-  const { id } = req.query;
   const conversationId = parseInt(req.params.id);
 
   const { content } = req.body;
@@ -138,6 +148,7 @@ const sendMessage = asyncHandler(async (req, res) => {
 
 
   // Add the message to the conversation
+  console.log('User', req.user.id, 'send message to conversation', conversationId, ': ', content);
   const message = await prisma.message.create({
     data: {
       content,
@@ -161,5 +172,5 @@ const sendMessage = asyncHandler(async (req, res) => {
 module.exports = {
   getMessages,
   sendMessage,
-  getConversationNumber,
+  getConversationWithUser,
 }

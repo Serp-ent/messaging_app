@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import styles from './Home.module.css';
+import { useAuth } from './AuthContext';
 
 export default function SidebarLeft({ onConversationSelect }) {
+  const { user } = useAuth();
   const [conversationsShort, setConversationsShort] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,20 +48,26 @@ export default function SidebarLeft({ onConversationSelect }) {
 
   return (
     <ul className={styles.conversationList}>
-      {conversationsShort.map((conversation) => (
-        <li key={conversation.id} >
+      {conversationsShort.map((conversation, i) => {
+
+        // TODO: shouldn't display password
+        const otherUser = conversation.participants.at(0).id === user.id ? conversation.participants.at(1) : conversation.participants.at(0);
+        const conversationName = (conversation.name != null && conversation.name !== '') ? conversation.name
+          : `${otherUser.firstName} ${otherUser.lastName}`;
+
+        return <li key={conversation.id} >
           <button
             onClick={() => onConversationSelect(conversation.id)}
             className={styles.conversation}
           >
             <div className={styles.userInfo}>
               <div className={styles.conversationAvatar}></div>
-              <div>{conversation.name || 'No Name'}</div>
+              <div>{conversationName}</div>
             </div>
             <div>{conversation.messages.length > 0 ? conversation.messages[0].content : 'No messages'}</div>
           </button>
         </li>
-      ))}
+      })}
     </ul>
   );
 }

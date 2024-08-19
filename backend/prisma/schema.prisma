@@ -25,10 +25,16 @@ model User {
   messages      Message[]      @relation("UserMessages")
 }
 
+enum ConversationType {
+  PRIVATE
+  GROUP
+}
+
 model Conversation {
-  id           Int       @id @default(autoincrement())
+  id           Int              @id @default(autoincrement())
   name         String? // Optional, could be used for group conversations
-  participants User[]    @relation("UserConversations")
+  type         ConversationType
+  participants User[]           @relation("UserConversations")
   messages     Message[]
 }
 
