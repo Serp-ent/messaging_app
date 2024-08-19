@@ -12,6 +12,10 @@ conversationsRoute.get('/',
   passport.authenticate('jwt', { session: false }),
   controller.getConversationsForUser);
 
+conversationsRoute.get('/private/:id',
+  passport.authenticate('jwt', { session: false }),
+  messageController.getConversationNumber);
+
 conversationsRoute.get('/:id', messageController.getMessages);
 
 conversationsRoute.post('/:id',

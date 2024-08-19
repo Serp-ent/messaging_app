@@ -2,6 +2,45 @@ const asyncHandler = require('express-async-handler');
 const { BadRequestError, NotFoundError } = require('../error/errors');
 const prisma = require('../db/prismaClient');
 
+const getConversationNumber = asyncHandler(async (req, res) => {
+  const otherUserId = parseInt(req.params.id);
+  const userId = req.user.id;
+
+  try {
+    console.log('Searching for private conversation between %d and %d', userId, otherUserId);
+
+    // Fetch all conversations involving the current user
+    const conversations = await prisma.conversation.findMany({
+      where: {
+        participants: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+      include: {
+        participants: true,
+      },
+    });
+
+    // Filter the conversations to find one with exactly two participants (private conversation)
+    const privateConversation = conversations.find(
+      (conversation) =>
+        conversation.participants.length === 2 &&
+        conversation.participants.some((p) => p.id === otherUserId)
+    );
+
+    if (privateConversation) {
+      res.json({ conversationId: privateConversation.id });
+    } else {
+      res.status(404).json({ message: 'Conversation not found' });
+    }
+  } catch (error) {
+    console.error('Error finding conversation:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 const getMessages = asyncHandler(async (req, res) => {
   const conversationId = parseInt(req.params.id);
   const limit = parseInt(req.query.limit) || 20; // Number of messages per page
@@ -122,4 +161,5 @@ const sendMessage = asyncHandler(async (req, res) => {
 module.exports = {
   getMessages,
   sendMessage,
+  getConversationNumber,
 }

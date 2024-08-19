@@ -163,7 +163,7 @@ export default function Home() {
         ) : null}
 
         {activeSidebar === 'users' ? (
-          <SidebarRight />
+          <SidebarRight onConversationSelect={handleLoadConversation} />
         ) : null}
 
       </aside>
