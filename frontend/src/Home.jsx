@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, createContext, useContext } from 'react';
 import styles from './Home.module.css';
 import SidebarRight from './SidebarRight';
 import SidebarLeft from './SidebarLeft';
 import { useAuth } from './AuthContext';
+import Header from './Header';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 async function fetchMessages(conversationId, page = 1, limit = 20) {
   const authToken = localStorage.getItem('authToken');
@@ -28,17 +30,19 @@ async function fetchMessages(conversationId, page = 1, limit = 20) {
   }
 }
 
+const ConversationContext = createContext();
+
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSidebar, setActiveSidebar] = useState('conversations');
   const [selectedConversation, setSelectedConversation] = useState(null);
-  const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [messageContent, setMessageContent] = useState('');
   const [showScrollButton, setShowScrollButton] = useState(false); // State to control the scroll button visibility
   const limit = 20;
+  const navigate = useNavigate();
 
   // Refs for scrolling
   const messagesEndRef = useRef(null);
@@ -115,6 +119,7 @@ export default function Home() {
   };
 
   const handleLoadConversation = async (id) => {
+    navigate('/');
     if (selectedConversation === id) {
       return;
     }
@@ -151,68 +156,50 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.mainContainer}>
-      {/* Left Sidebar: Conversations and Users */}
-      <aside className={`${styles.sidebarLeft} ${isMenuOpen ? styles.open : ''}`}>
-        <button className={styles.switchSidebarButton} onClick={toggleActiveSidebar}>
-          Switch to {activeSidebar === 'conversations' ? 'Users' : 'Conversations'}
-        </button>
-
-        {(activeSidebar === 'conversations') ? (
-          <SidebarLeft onConversationSelect={handleLoadConversation} />
-        ) : null}
-
-        {activeSidebar === 'users' ? (
-          <SidebarRight onConversationSelect={handleLoadConversation} />
-        ) : null}
-
-      </aside>
-
-      <main className={styles.main}>
-        <div
-          className={styles.messages}
-          onScroll={handleScroll}
-          ref={messagesContainerRef} // Attach the ref to the messages container
-        >
-          {!selectedConversation && <div>Select a conversation to view messages</div>}
-          {messages.map((message) => (
-            <div key={message.id}>
-              <div className={`${styles.messageHeader} ${(message.senderId === user.id) ? styles.sent : styles.received}`}>
-                <time dateTime={message.timestamp} className={styles.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
-                <div className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</div>
-              </div>
-              <div className={`${styles.message} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}>
-                <p>{message.content}</p>
-              </div>
-
-            </div>
-          ))}
-          {/* Dummy div to mark the end of the messages for scrolling */}
-          <div ref={messagesEndRef} />
-        </div>
-        {selectedConversation && (
-          <div className={styles.messageInput}>
-            <textarea
-              value={messageContent}
-              onChange={(e) => setMessageContent(e.target.value)}
-              placeholder='Send a message'
-            />
-            <button onClick={sendMessage}>Send</button>
-          </div>
-        )}
-        {/* Scroll to Bottom Button */}
-        {showScrollButton && (
-          <button className={styles.scrollButton} onClick={scrollToBottom}>
-            Scroll to Bottom
+    <>
+      <Header />
+      <div className={styles.mainContainer}>
+        {/* Left Sidebar: Conversations and Users */}
+        <aside className={`${styles.sidebarLeft} ${isMenuOpen ? styles.open : ''}`}>
+          <button className={styles.switchSidebarButton} onClick={toggleActiveSidebar}>
+            Switch to {activeSidebar === 'conversations' ? 'Users' : 'Conversations'}
           </button>
-        )}
-      </main>
 
-      {/* Menu Button for narrow screens */}
-      <button className={styles.menuButton} onClick={toggleMenu}>
-        &#9776;
-      </button>
-      {isMenuOpen && <div className={styles.overlay} onClick={toggleMenu}></div>}
-    </div>
+          {(activeSidebar === 'conversations') ? (
+            <SidebarLeft onConversationSelect={handleLoadConversation} />
+          ) : null}
+
+          {activeSidebar === 'users' ? (
+            <SidebarRight onConversationSelect={handleLoadConversation} />
+          ) : null}
+
+        </aside>
+
+        <main className={styles.main}>
+          <ConversationContext.Provider value={{
+            handleScroll,
+            messagesContainerRef,
+            selectedConversation,
+            messages,
+            messagesEndRef,
+            messageContent,
+            setMessageContent,
+            scrollToBottom,
+            sendMessage,
+            showScrollButton,
+          }}>
+            <Outlet />
+          </ConversationContext.Provider>
+        </main>
+
+        {/* Menu Button for narrow screens */}
+        <button className={styles.menuButton} onClick={toggleMenu}>
+          &#9776;
+        </button>
+        {isMenuOpen && <div className={styles.overlay} onClick={toggleMenu}></div>}
+      </div>
+    </>
   );
 }
+
+export const useConversationContext = () => useContext(ConversationContext);
