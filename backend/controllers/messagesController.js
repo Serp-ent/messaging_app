@@ -27,23 +27,18 @@ const getConversationWithUser = asyncHandler(async (req, res) => {
     });
 
     if (!conversation) {
-      console.log('No conversation between these users');
-      res.json({ msg: 'no conversation with given id' });
-      return;
-      // conversation = await prisma.conversation.create({
-      //   data: {
-      //     type: 'PRIVATE', // Set the type to 'PRIVATE'
-      //     participants: {
-      //       connect: [{ id: userId }, { id: otherUserId }],
-      //     },
-      //   },
-      //   include: {
-      //     participants: true,
-      //   },
-      // });
+      conversation = await prisma.conversation.create({
+        data: {
+          type: 'PRIVATE',
+          participants: {
+            connect: [{ id: userId }, { id: otherUserId }],
+          },
+        },
+        include: {
+          participants: true,
+        },
+      });
     }
-
-    console.log("Conversation found");
 
     res.json({ conversationId: conversation.id });
   } catch (error) {
@@ -148,7 +143,6 @@ const sendMessage = asyncHandler(async (req, res) => {
 
 
   // Add the message to the conversation
-  console.log('User', req.user.id, 'send message to conversation', conversationId, ': ', content);
   const message = await prisma.message.create({
     data: {
       content,
