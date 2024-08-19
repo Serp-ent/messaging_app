@@ -38,7 +38,7 @@ export default function Home() {
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [messageContent, setMessageContent] = useState('');
   const [showScrollButton, setShowScrollButton] = useState(false); // State to control the scroll button visibility
-  const limit = 10;
+  const limit = 20;
 
   // Refs for scrolling
   const messagesEndRef = useRef(null);
@@ -176,13 +176,15 @@ export default function Home() {
         >
           {!selectedConversation && <div>Select a conversation to view messages</div>}
           {messages.map((message) => (
-            <div key={message.id}
-              className={`${styles.messageBubble} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}>
-              <div>
-                <time dateTime={message.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
+            <div key={message.id}>
+              <div className={`${styles.messageHeader} ${(message.senderId === user.id) ? styles.sent : styles.received}`}>
+                <time dateTime={message.timestamp} className={styles.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
                 <div className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</div>
+              </div>
+              <div className={`${styles.message} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}>
                 <p>{message.content}</p>
               </div>
+
             </div>
           ))}
           {/* Dummy div to mark the end of the messages for scrolling */}

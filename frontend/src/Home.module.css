@@ -13,8 +13,7 @@
   background-color: green;
 }
 
-.main {
-}
+.main {}
 
 .messages {
   background-color: rgb(136, 136, 243);
@@ -23,20 +22,62 @@
   height: 80vh;
 }
 
-.messageBubble {
+.message {
   display: flex;
   border-radius: 16px;
-  padding: 8px;
+}
+
+.message p {
+  padding: 12px;
+  margin: 0;
+  border-radius: 16px;
 }
 
 .messageSend {
-  background-color: lightblue;
   justify-content: flex-end;
+}
 
+.messageHeader {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  position: relative;
+}
+
+.messageHeader .sender {
+  font-weight: bold;
+  text-align: left;
+  grid-column: 1;
+}
+
+.messageHeader .timestamp {
+  text-align: center;
+  grid-column: 2;
+  font-size: 0.875rem;
+}
+
+.messageSend p {
+  background-color: lightblue;
+}
+
+.sent .sender {
+  text-align: right;
+  grid-column: 3;
+}
+
+.received .sender {
+  text-align: left;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.messageReceived p {
+  background-color: gray;
 }
 
 .messageReceived {
-  background-color: gray;
   justify-content: flex-start;
 }
 
