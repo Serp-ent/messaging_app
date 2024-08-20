@@ -41,8 +41,10 @@ export default function App() {
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [messageContent, setMessageContent] = useState('');
   const [showScrollButton, setShowScrollButton] = useState(false); // State to control the scroll button visibility
-  const limit = 20;
+  const { user, loading: loadingAuth } = useAuth();
   const navigate = useNavigate();
+
+  const limit = 20;
 
   // Refs for scrolling
   const messagesEndRef = useRef(null);
@@ -160,20 +162,23 @@ export default function App() {
       <Header />
       <div className={styles.mainContainer}>
         {/* Left Sidebar: Conversations and Users */}
-        <aside className={`${styles.sidebarLeft} ${isMenuOpen ? styles.open : ''}`}>
-          <button className={styles.switchSidebarButton} onClick={toggleActiveSidebar}>
-            Switch to {activeSidebar === 'conversations' ? 'Users' : 'Conversations'}
-          </button>
+        {(!loadingAuth && user) && (
+          <>
+            <aside className={`${styles.sidebarLeft} ${isMenuOpen ? styles.open : ''}`}>
+              <button className={styles.switchSidebarButton} onClick={toggleActiveSidebar}>
+                Switch to {activeSidebar === 'conversations' ? 'Users' : 'Conversations'}
+              </button>
 
-          {(activeSidebar === 'conversations') ? (
-            <SidebarLeft onConversationSelect={handleLoadConversation} />
-          ) : null}
+              {activeSidebar === 'conversations' ? (
+                <SidebarLeft onConversationSelect={handleLoadConversation} />
+              ) : null}
 
-          {activeSidebar === 'users' ? (
-            <SidebarRight onConversationSelect={handleLoadConversation} />
-          ) : null}
-
-        </aside>
+              {activeSidebar === 'users' ? (
+                <SidebarRight onConversationSelect={handleLoadConversation} />
+              ) : null}
+            </aside>
+          </>
+        )}
 
         <main className={styles.main}>
           <ConversationContext.Provider value={{
@@ -193,10 +198,12 @@ export default function App() {
         </main>
 
         {/* Menu Button for narrow screens */}
-        <button className={styles.menuButton} onClick={toggleMenu}>
-          &#9776;
-        </button>
-        {isMenuOpen && <div className={styles.overlay} onClick={toggleMenu}></div>}
+        {(!loadingAuth && user) && (
+          <button className={styles.menuButton} onClick={toggleMenu}>
+            &#9776;
+          </button>
+        )}
+        {(!loadingAuth && user && isMenuOpen) && <div className={styles.overlay} onClick={toggleMenu}></div>}
       </div>
     </>
   );
