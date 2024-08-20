@@ -7,28 +7,50 @@
 }
 
 .sidebarLeft {
-  background-color: red;
+  padding: 8px;
+  border: 2px solid white;
+  border-radius: 8px;
+  background-color: #2C3E50;
   transition: transform 0.3s ease-in-out;
 }
 
-.sidebarRight {
-  background-color: green;
+
+.switchSidebarButton:hover {
+  background-color: #0056b3;
 }
+
+.switchSidebarButton {
+  background-color: #007BFF;
+  padding: 6px 12px;
+  border: 1px solid white;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+}
+
+.sidebarRight {}
 
 .main {
   grid-column: 2;
 }
 
 .messages {
-  background-color: rgb(136, 136, 243);
+  background-color: #F0F0F0;
+  border: 2px solid #007BFF;
+  border-radius: 24px;
+  margin: 4px;
   padding: 16px;
   overflow-y: auto;
   height: 80vh;
 }
 
+/* // TODO: choosen message should have this color
+  background-color: #2C3E50; */
 .message {
+  font-size: 0.95rem;
   display: flex;
   border-radius: 16px;
+  color: #222222;
 }
 
 .message p {
@@ -42,6 +64,7 @@
 }
 
 .messageHeader {
+  color: #555555;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
@@ -69,6 +92,7 @@
 
 .messageSend p {
   background-color: lightblue;
+  /* #E0F7FA */
 }
 
 .sent .sender {
@@ -83,7 +107,7 @@
 }
 
 .messageReceived p {
-  background-color: gray;
+  background-color: #FFFFFF;
 }
 
 .messageReceived {
@@ -123,12 +147,16 @@
   width: 95%;
 }
 
+.conversation.opened {
+  background-color: #c9c9c9;
+  border-color: white;
+}
+
 .conversation {
   box-sizing: border-box;
-  border: 1px solid black;
   padding: 8px;
   width: 100%;
-  background-color: white;
+  border: 2px solid #2C3E50;
   align-items: center;
   justify-content: space-between;
   border-radius: 16px;

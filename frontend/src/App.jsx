@@ -170,7 +170,9 @@ export default function App() {
               </button>
 
               {activeSidebar === 'conversations' ? (
-                <SidebarLeft onConversationSelect={handleLoadConversation} />
+                <SidebarLeft
+                  selectedConversation={selectedConversation}
+                  onConversationSelect={handleLoadConversation} />
               ) : null}
 
               {activeSidebar === 'users' ? (

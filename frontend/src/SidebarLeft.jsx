@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import styles from './App.module.css';
 import { useAuth } from './AuthContext';
 
-export default function SidebarLeft({ onConversationSelect }) {
+export default function SidebarLeft({
+  selectedConversation,
+  onConversationSelect,
+}) {
   const { user } = useAuth();
   const [conversationsShort, setConversationsShort] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,9 +49,10 @@ export default function SidebarLeft({ onConversationSelect }) {
     return <div>Error: {error}</div>;
   }
 
+  console.log('Selected conversation', selectedConversation);
   return (
     <ul className={styles.conversationList}>
-      {conversationsShort.map((conversation, i) => {
+      {conversationsShort.map((conversation) => {
 
         // TODO: shouldn't display password
         const otherUser = conversation.participants.at(0).id === user.id ? conversation.participants.at(1) : conversation.participants.at(0);
@@ -58,16 +62,16 @@ export default function SidebarLeft({ onConversationSelect }) {
         return <li key={conversation.id} >
           <button
             onClick={() => onConversationSelect(conversation.id)}
-            className={styles.conversation}
+            className={`${styles.conversation} ${conversation.id === selectedConversation ? styles.opened : ''}`}
           >
-            <div className={styles.userInfo}>
-              <div className={styles.conversationAvatar}></div>
-              <div>{conversationName}</div>
-            </div>
-            <div>{conversation.messages.length > 0 ? conversation.messages[0].content : 'No messages'}</div>
-          </button>
+          <div className={styles.userInfo}>
+            <div className={styles.conversationAvatar}></div>
+            <div>{conversationName}</div>
+          </div>
+          <div>{conversation.messages.length > 0 ? conversation.messages[0].content : 'No messages'}</div>
+        </button>
         </li>
       })}
-    </ul>
+    </ul >
   );
 }
