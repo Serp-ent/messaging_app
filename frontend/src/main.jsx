@@ -11,6 +11,7 @@ import AuthRedirect from './AuthRedirect.jsx'
 import Profile from './Profile.jsx'
 import Conversation from './Conversation.jsx'
 import App from './App.jsx'
+import './main.css'
 
 const router = createBrowserRouter([
   {
