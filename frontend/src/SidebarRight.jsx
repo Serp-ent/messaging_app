@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import styles from './App.module.css';
+import styles from './SidebarRight.module.css';
 import { useAuth } from './AuthContext';
 
 export default function SidebarRight({ onConversationSelect }) {
@@ -72,17 +72,14 @@ export default function SidebarRight({ onConversationSelect }) {
     </li >
   })
   return (
-    <div>
-      <label>
-        Search:
-      </label>
+    <div className={styles.usersWrapper}>
       <input
         type='text'
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
         placeholder='Search users'
       />
-      <ul>
+      <ul className={styles.usersAvailable}>
         {userList}
       </ul>
 

@@ -166,7 +166,7 @@ export default function App() {
           <>
             <aside className={`${styles.sidebarLeft} ${isMenuOpen ? styles.open : ''}`}>
               <button className={styles.switchSidebarButton} onClick={toggleActiveSidebar}>
-                Switch to {activeSidebar === 'conversations' ? 'Users' : 'Conversations'}
+                {activeSidebar === 'users' ? 'Users' : 'Conversations'}
               </button>
 
               {activeSidebar === 'conversations' ? (

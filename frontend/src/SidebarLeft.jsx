@@ -49,7 +49,6 @@ export default function SidebarLeft({
     return <div>Error: {error}</div>;
   }
 
-  console.log('Selected conversation', selectedConversation);
   return (
     <ul className={styles.conversationList}>
       {conversationsShort.map((conversation) => {
