@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, createContext, useContext } from 'react';
-import styles from './Home.module.css';
+import styles from './App.module.css';
 import SidebarRight from './SidebarRight';
 import SidebarLeft from './SidebarLeft';
 import { useAuth } from './AuthContext';
@@ -32,7 +32,7 @@ async function fetchMessages(conversationId, page = 1, limit = 20) {
 
 const ConversationContext = createContext();
 
-export default function Home() {
+export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSidebar, setActiveSidebar] = useState('conversations');
   const [selectedConversation, setSelectedConversation] = useState(null);

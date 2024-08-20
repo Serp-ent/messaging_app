@@ -4,18 +4,18 @@ import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import ErrorPage from './ErrorPage.jsx'
 import AuthProvider from './AuthContext.jsx'
-import Home from './Home.jsx'
 import LoginPage from './LoginPage.jsx'
 import RegisterPage from './RegisterPage.jsx'
 import ProtectedRoute from './ProtectedRoute.jsx'
 import AuthRedirect from './AuthRedirect.jsx'
 import Profile from './Profile.jsx'
 import Conversation from './Conversation.jsx'
+import App from './App.jsx'
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <AuthProvider><Home /></AuthProvider>,
+    element: <AuthProvider><App /></AuthProvider>,
     errorElement: <ErrorPage />,
     children: [
       {

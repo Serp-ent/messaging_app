@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from './Home.module.css';
+import styles from './App.module.css';
 import { useAuth } from './AuthContext';
 
 export default function SidebarLeft({ onConversationSelect }) {
