@@ -52,6 +52,11 @@
   grid-column: 1;
 }
 
+.messageHeader .sender a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .messageHeader .timestamp {
   text-align: center;
   grid-column: 2;

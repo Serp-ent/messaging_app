@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useConversationContext } from './Home';
 import styles from './Home.module.css'
@@ -28,7 +29,11 @@ export default function Conversation() {
           <div key={message.id}>
             <div className={`${styles.messageHeader} ${(message.senderId === user.id) ? styles.sent : styles.received}`}>
               <time dateTime={message.timestamp} className={styles.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</time>
-              <div className={styles.sender}>{message.sender.firstName} {message.sender.lastName}</div>
+              <div className={styles.sender}>
+                <Link to={`/profile/${message.senderId}`}>
+                  {message.sender.firstName} {message.sender.lastName}
+                </Link>
+              </div>
             </div>
             <div className={`${styles.message} ${(message.senderId === user.id) ? styles.messageSend : styles.messageReceived}`}>
               <p>{message.content}</p>
