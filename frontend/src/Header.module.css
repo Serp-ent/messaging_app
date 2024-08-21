@@ -1,4 +1,7 @@
 .header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+
   width: 100%;
   position: sticky;
   top: 0;

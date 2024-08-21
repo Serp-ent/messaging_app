@@ -33,47 +33,45 @@ export default function App() {
   };
 
   return (
-    <>
+    <div className={styles.mainContainer}>
       <Header />
-      <div className={styles.mainContainer}>
-        {/* Left Sidebar: Conversations and Users */}
-        {(!loadingAuth && user) && (
-          <>
-            <aside className={`${styles.sidebarLeft} ${isMenuOpen ? styles.open : ''}`}>
-              <button className={styles.switchSidebarButton} onClick={toggleActiveSidebar}>
-                {activeSidebar === 'users' ? 'Users' : 'Conversations'}
-              </button>
+      {/* Left Sidebar: Conversations and Users */}
+      {(!loadingAuth && user) && (
+        <>
+          <aside className={`${styles.sidebarLeft} ${isMenuOpen ? styles.open : ''}`}>
+            <button className={styles.switchSidebarButton} onClick={toggleActiveSidebar}>
+              {activeSidebar === 'users' ? 'Users' : 'Conversations'}
+            </button>
 
-              {activeSidebar === 'conversations' ? (
-                <SidebarLeft
-                  selectedConversation={selectedConversation}
-                  onConversationSelect={handleLoadConversation} />
-              ) : null}
+            {activeSidebar === 'conversations' ? (
+              <SidebarLeft
+                selectedConversation={selectedConversation}
+                onConversationSelect={handleLoadConversation} />
+            ) : null}
 
-              {activeSidebar === 'users' ? (
-                <SidebarRight onConversationSelect={handleLoadConversation} />
-              ) : null}
-            </aside>
-          </>
-        )}
+            {activeSidebar === 'users' ? (
+              <SidebarRight onConversationSelect={handleLoadConversation} />
+            ) : null}
+          </aside>
+        </>
+      )}
 
-        <main className={styles.main}>
-          <ConversationContext.Provider value={{
-            selectedConversation,
-          }}>
-            <Outlet />
-          </ConversationContext.Provider>
-        </main>
+      <main className={styles.main}>
+        <ConversationContext.Provider value={{
+          selectedConversation,
+        }}>
+          <Outlet />
+        </ConversationContext.Provider>
+      </main>
 
-        {/* Menu Button for narrow screens */}
-        {(!loadingAuth && user) && (
-          <button className={styles.menuButton} onClick={toggleMenu}>
-            &#9776;
-          </button>
-        )}
-        {(!loadingAuth && user && isMenuOpen) && <div className={styles.overlay} onClick={toggleMenu}></div>}
-      </div>
-    </>
+      {/* Menu Button for narrow screens */}
+      {(!loadingAuth && user) && (
+        <button className={styles.menuButton} onClick={toggleMenu}>
+          &#9776;
+        </button>
+      )}
+      {(!loadingAuth && user && isMenuOpen) && <div className={styles.overlay} onClick={toggleMenu}></div>}
+    </div>
   );
 }
 
