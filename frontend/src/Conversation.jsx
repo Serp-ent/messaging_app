@@ -56,11 +56,13 @@ export default function Conversation() {
           </div>
         )
       }
-      {/* Scroll to Bottom Button */}
       {
         showScrollButton && (
-          <button className={styles.scrollButton} onClick={scrollToBottom}>
-            Scroll to Bottom
+          <button
+            className={`${styles.scrollButton} ${showScrollButton ? styles.show : ''}`}
+            onClick={scrollToBottom}
+          >
+            ↓
           </button>
         )
       }
