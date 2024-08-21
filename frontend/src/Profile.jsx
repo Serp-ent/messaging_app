@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import { useEffect, useState } from "react";
+import styles from './Profile.module.css'
 
 export default function Profile() {
   const { id: paramId } = useParams();
@@ -68,13 +69,18 @@ export default function Profile() {
 
 
   return (
-    <div>
-      <h1>Profile</h1>
-      {isOwnProfile && (
-        <button onClick={() => setIsEdit((prev) => !prev)}>
-          {isEditing ? 'Cancel' : 'Edit Profile'}
-        </button>
-      )}
+    <div className={styles.profile}>
+      <div className={styles.profileHeader}>
+        <h1>Profile</h1>
+        {isOwnProfile && (
+          <button
+            onClick={() => setIsEdit((prev) => !prev)}
+            className={styles.button}
+          >
+            {isEditing ? 'Cancel' : 'Edit Profile'}
+          </button>
+        )}
+      </div>
       {isEditing ? (
         <form onSubmit={updateUser}>
           <label>
@@ -95,7 +101,10 @@ export default function Profile() {
               onChange={handleChange}
             />
           </label>
-          <button>Save</button>
+
+          <div className={styles.buttonWrapper}>
+            <button className={styles.button}>Save</button>
+          </div>
         </form>
       ) : (
         <div>

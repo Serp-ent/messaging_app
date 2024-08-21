@@ -88,7 +88,10 @@ export default function RegisterPage() {
             required
           />
         </div>
-        <button type="submit">Register</button>
+
+        <div className={styles.buttonWrapper}>
+        <button type="submit" className={styles.button}>Register</button>
+        </div>
       </form>
       <p>
         Already have an account? <Link to={'/login'}>Login</Link>
