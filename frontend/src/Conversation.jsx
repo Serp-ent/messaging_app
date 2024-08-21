@@ -90,18 +90,15 @@ export default function Conversation() {
   }
 
   const handleScroll = (e) => {
-    if (e.target.scrollTop === 0 && hasMoreMessages) {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+
+    if (scrollTop === 0 && hasMoreMessages) {
       const nextPage = page + 1;
       loadMessages(selectedConversation, nextPage);
       setPage(nextPage);
     }
 
-    // Show or hide the scroll button based on the scroll position
-    if (e.target.scrollHeight - e.target.scrollTop > e.target.clientHeight + 100) {
-      setShowScrollButton(true);
-    } else {
-      setShowScrollButton(false);
-    }
+    setShowScrollButton(scrollHeight - scrollTop > clientHeight + 100);
   };
 
   const scrollToBottom = () => {
