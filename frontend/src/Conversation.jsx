@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useConversationContext } from './App';
-import styles from './App.module.css'
+import styles from './Conversation.module.css'
 
 export default function Conversation() {
   const { user } = useAuth();
