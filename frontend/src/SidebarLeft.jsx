@@ -63,12 +63,13 @@ export default function SidebarLeft({
             onClick={() => onConversationSelect(conversation.id)}
             className={`${styles.conversation} ${conversation.id === selectedConversation ? styles.opened : ''}`}
           >
-          <div className={styles.userInfo}>
-            <div className={styles.conversationAvatar}></div>
-            <div>{conversationName}</div>
-          </div>
-          <div>{conversation.messages.length > 0 ? conversation.messages[0].content : 'No messages'}</div>
-        </button>
+            <div className={styles.userInfo}>
+              <div className={styles.conversationAvatar}></div>
+              <div className={styles.conversationName}>{conversationName}</div>
+            </div>
+
+            <div className={styles.lastMessage}>{conversation.messages.length > 0 ? conversation.messages[0].content : 'No messages'}</div>
+          </button>
         </li>
       })}
     </ul >

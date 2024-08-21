@@ -75,17 +75,35 @@
 }
 
 
-.switchSidebarButton:hover {
-  background-color: #0056b3;
-}
-
 .switchSidebarButton {
   background-color: #007BFF;
-  padding: 6px 12px;
-  border: 1px solid white;
-  border-radius: 8px;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: 12px;
   color: white;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+.switchSidebarButton:hover {
+  background-color: #0056b3;
+  box-shadow: 0 6px 10px rgba(0, 86, 179, 0.3);
+  transform: translateY(-2px);
+}
+
+.switchSidebarButton:active {
+  background-color: #004494;
+  box-shadow: 0 4px 6px rgba(0, 68, 148, 0.3);
+  transform: translateY(0);
+}
+
+.switchSidebarButton:focus {
+  outline: 2px solid #0056b3;
+  outline-offset: 2px;
 }
 
 .sidebarRight {}
@@ -104,8 +122,6 @@
   height: 80vh;
 }
 
-/* // TODO: choosen message should have this color
-  background-color: #2C3E50; */
 .message {
   font-size: 0.95rem;
   display: flex;
@@ -255,6 +271,23 @@
   border-radius: 50%;
 }
 
+.conversationName {
+  font-size: 1.5rem;
+}
+
+.lastMessage {
+  width: 95%;
+  text-align: left;
+  font-weight: bold;
+
+  color: #222222;
+
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 1024px) {
   .mainContainer {
     grid-template-columns: 1fr 3fr;
@@ -294,4 +327,82 @@
   .menuButton {
     display: block;
   }
+}
+
+.conversationList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: calc(100vh - 60px);
+}
+
+.conversationList li {
+  width: 100%;
+}
+
+.conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background-color: #f8f9fa;
+  color: #2C3E50;
+  text-align: left;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.conversation:hover {
+  background-color: #e9ecef;
+  border-color: #007BFF;
+}
+
+.selectedConversation {
+  background-color: #007BFF;
+  color: white;
+  border-color: #0056b3;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.conversationAvatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: #ced4da;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 16px;
+}
+
+.conversationDetails {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.conversationName {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.loading,
+.error {
+  padding: 20px;
+  text-align: center;
+  font-size: 1rem;
+  color: #6c757d;
 }

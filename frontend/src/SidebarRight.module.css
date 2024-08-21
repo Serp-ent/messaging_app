@@ -1,27 +1,72 @@
 ul.usersAvailable {
   list-style-type: none;
   padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  align-items: center;
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
 }
 
 .usersAvailable li {
-  width: 95%;
+  width: 100%;
 }
 
 .usersAvailable button {
   box-sizing: border-box;
-  padding: 12px;
+  padding: 12px 16px;
   width: 100%;
   border: 2px solid #2C3E50;
+  display: flex;
   align-items: center;
   justify-content: space-between;
   border-radius: 16px;
+  background-color: #F7F9FA;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 1rem;
+  color: #2C3E50;
+  cursor: pointer;
+}
+
+.usersAvailable button:hover {
+  background-color: #E0E4E7;
+  transform: translateY(-2px);
+}
+
+.usersAvailable button:active {
+  background-color: #D3D8DC;
+  transform: translateY(0);
 }
 
 .usersWrapper {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.usersWrapper input {
+  box-sizing: border-box;
+  padding: 8px 12px; 
+  width: 100%;
+  border: 2px solid #2C3E50;
+  border-radius: 16px;
+  background-color: #F7F9FA;
+  font-size: 1rem;
+  color: #2C3E50;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.usersWrapper input:focus {
+  border-color: #007BFF;
+  background-color: #FFFFFF;
+  outline: none;
+}
+
+.usersWrapper input::placeholder {
+  color: #BDC3C7;
 }
