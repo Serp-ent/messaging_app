@@ -43,7 +43,7 @@ export default function RegisterPage() {
     <div className={styles.container}>
       <h2>Register</h2>
       {error && <p className={styles.error}>{error}</p>}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.inputGroup}>
           <label htmlFor="username">Username</label>
           <input
