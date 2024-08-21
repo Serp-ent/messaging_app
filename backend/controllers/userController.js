@@ -175,9 +175,35 @@ const getUser = asyncHandler(async (req, res) => {
   });
 });
 
+
+// TODO: add tests for pagination
 const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await prisma.user.findMany({});
-  res.json({ status: 'success', users });
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 5;
+
+  if (page <= 0 || limit <= 0) {
+    throw new BadRequestError('Page and limit must be positive integers');
+  }
+
+  const skip = (page - 1) * limit
+
+  const users = await prisma.user.findMany({
+    orderBy: {
+      username: 'asc',
+    },
+    skip: skip,
+    take: limit,
+  });
+
+  const totalCount = await prisma.user.count();
+  const totalPages = Math.ceil(totalCount / limit);
+
+  res.json({
+    status: 'success',
+    users,
+    totalPages,
+    page
+  });
 });
 
 module.exports = {
