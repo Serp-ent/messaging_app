@@ -57,7 +57,6 @@ export default function Header() {
           <Link to={'/register'}>Register</Link>
         </>
       )}
-      <div className={styles.spacer}></div>
     </header>
   );
 }
