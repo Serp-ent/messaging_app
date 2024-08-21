@@ -423,3 +423,27 @@
   font-size: 1rem;
   color: #6c757d;
 }
+
+.messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background-color: #007bff;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+}
+
+.messages::-webkit-scrollbar-thumb:hover {
+  background-color: #0056b3;
+}
+
+.messages {
+  scrollbar-width: thin;
+  scrollbar-color: #007bff #f1f1f1;
+}
