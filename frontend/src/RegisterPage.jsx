@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import styles from './RegisterPage.module.css';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -24,30 +25,26 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords don't match!");
       return;
     }
 
-    // Here you would typically send `formData` to the server to register the user.
     try {
-      // Simulate a successful registration (you would replace this with an actual API call)
       const fakeToken = 'fake-jwt-token';
-      login(fakeToken); // Login after registration
-      navigate('/'); // Redirect to home page after successful registration
+      login(fakeToken);
+      navigate('/');
     } catch (err) {
       setError('Registration failed. Please try again.');
     }
   };
 
   return (
-    <div>
-
+    <div className={styles.container}>
       <h2>Register</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className={styles.error}>{error}</p>}
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className={styles.inputGroup}>
           <label htmlFor="username">Username</label>
           <input
             type="text"
@@ -58,7 +55,7 @@ export default function RegisterPage() {
             required
           />
         </div>
-        <div>
+        <div className={styles.inputGroup}>
           <label htmlFor="email">Email</label>
           <input
             type="email"
@@ -69,7 +66,7 @@ export default function RegisterPage() {
             required
           />
         </div>
-        <div>
+        <div className={styles.inputGroup}>
           <label htmlFor="password">Password</label>
           <input
             type="password"
@@ -80,7 +77,7 @@ export default function RegisterPage() {
             required
           />
         </div>
-        <div>
+        <div className={styles.inputGroup}>
           <label htmlFor="confirmPassword">Confirm Password</label>
           <input
             type="password"
