@@ -179,7 +179,7 @@ const getUser = asyncHandler(async (req, res) => {
 // TODO: add tests for pagination
 const getAllUsers = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 5;
+  const limit = parseInt(req.query.limit, 10) || 10;
 
   if (page <= 0 || limit <= 0) {
     throw new BadRequestError('Page and limit must be positive integers');

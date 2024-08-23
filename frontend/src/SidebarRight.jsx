@@ -1,18 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './SidebarRight.module.css';
 import { useAuth } from './AuthContext';
 
+// Fetch users from the server
 export default function SidebarRight({ onConversationSelect }) {
   const { user: userAuth } = useAuth();
-  const [users, setUsers] = useState(0);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [hasMoreUsers, setHasMoreUsers] = useState(true);
+
+  const usersWrapperRef = useRef(null);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUsers = async (page) => {
       try {
         const token = localStorage.getItem("authToken");
-        const response = await fetch(`http://localhost:3000/api/users/`, {
+        const response = await fetch(`http://localhost:3000/api/users?page=${page}&limit=20`, {
           method: "GET",
           headers: {
             'Content-Type': "application/json",
@@ -21,26 +26,41 @@ export default function SidebarRight({ onConversationSelect }) {
         });
 
         const result = await response.json();
+        const newUsers = result.users.filter(u => u.id !== userAuth.id);
 
-        const users = result.users.filter(u => u.id !== userAuth.id);
-        setUsers(users);
+        setUsers(prevUsers => {
+          // Filter out any users that already exist in prevUsers
+          const newUniqueUsers = newUsers.filter(newUser => !prevUsers.some(prevUser => prevUser.id === newUser.id));
+          return [...prevUsers, ...newUniqueUsers];
+        });
+
+        setHasMoreUsers(page < result.totalPages);
+        setLoading(false);
       } catch (err) {
         console.error(err);
-      } finally {
         setLoading(false);
       }
+    };
+
+    fetchUsers(page);
+  }, [page, userAuth]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const wrapper = usersWrapperRef.current;
+
+      // Check if the user has scrolled near the bottom of the container
+      if (wrapper && wrapper.scrollTop + wrapper.clientHeight >= wrapper.scrollHeight - 10 && hasMoreUsers) {
+        setPage(prevPage => prevPage + 1);
+      }
+    };
+
+    const wrapper = usersWrapperRef.current;
+    if (wrapper) {
+      wrapper.addEventListener('scroll', handleScroll);
+      return () => wrapper.removeEventListener('scroll', handleScroll);
     }
-
-    fetchUsers();
-  }, [userAuth]);
-
-  if (loading) {
-    return <div>Loading...</div>
-  }
-
-  if (loading) {
-    return <div>Loading...</div>
-  }
+  }, [hasMoreUsers]);
 
   const handleOpenConversation = async (userId) => {
     try {
@@ -57,22 +77,24 @@ export default function SidebarRight({ onConversationSelect }) {
     } catch (err) {
       console.error('Failed to open conversation:', err);
     }
-  }
+  };
 
   const filteredUsers = users.filter((u) =>
     `${u.firstName} ${u.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // TODO: on click it should open conversation with that user
   const userList = filteredUsers.map(u => {
-    return <li key={u.id}>
-      <button onClick={() => handleOpenConversation(u.id)}>
-        {u.firstName} {u.lastName}
-      </button>
-    </li >
-  })
+    return (
+      <li key={u.id}>
+        <button onClick={() => handleOpenConversation(u.id)}>
+          {u.firstName} {u.lastName}
+        </button>
+      </li>
+    );
+  });
+
   return (
-    <div className={styles.usersWrapper}>
+    <div className={styles.usersWrapper} ref={usersWrapperRef}>
       <input
         type='text'
         value={searchTerm}
@@ -81,8 +103,9 @@ export default function SidebarRight({ onConversationSelect }) {
       />
       <ul className={styles.usersAvailable}>
         {userList}
+        <li id="scroll-end"></li> {/* Scroll target for IntersectionObserver */}
       </ul>
-
+      {loading && <div>Loading...</div>}
     </div>
   );
 }
